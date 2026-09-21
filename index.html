@@ -8,11 +8,21 @@
 <meta name="theme-color" content="#04060d">
 <meta name="color-scheme" content="dark">
 
-<!-- 分享卡片：以后发出去至少有个像样的预览 -->
+<!-- 分享卡片：以后发出去至少有个像样的预览。
+     og:image 必须是绝对地址，社交平台不会去猜相对路径。
+     域名若是别的，这里的 yuanmoon.me 要一起换。 -->
+<link rel="canonical" href="https://yuanmoon.me/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="缘梦 YuanMoon">
-<meta property="og:description" content="起点与圆满。一个人的小站。">
+<meta property="og:site_name" content="缘梦 YuanMoon">
+<meta property="og:title" content="缘梦 YuanMoon · 起点与圆满">
+<meta property="og:description" content="一个人的小站。放我自己做的小游戏、正在啃的时空与相对论。">
+<meta property="og:url" content="https://yuanmoon.me/">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yuanmoon.me/assets/img/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="深空底色上一轮圆月，左侧写着缘梦 YuanMoon">
+<meta name="twitter:card" content="summary_large_image">
 
 <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/favicon.svg">
@@ -182,27 +192,28 @@
       <h2 id="worksTitle">正在建造的东西</h2>
       <p class="hero__lede" style="font-size:var(--fs-base);color:var(--color-muted)">
         每张卡片的图标是一枚月相。它现在是什么形状，进度就是什么样 ——
-        新的还没亮起来，做完的会转成满月。
+        刚冒头的还是细月牙，能玩的已经转成盈凸月，做完的会转成满月。
       </p>
     </div>
 
     <div class="works">
-      <article class="work">
+      <article class="work work--live">
         <div class="work__head">
-          <!-- 月相即进度：这张是约 15% 的细月牙，对应"筹备中" -->
+          <!-- 月相即进度：这张已经转到盈凸月（约 85%），对应"可玩，还在加" -->
           <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
             <circle cx="20" cy="20" r="14" fill="#131a2c"/>
-            <path d="M20 6 A14 14 0 0 1 20 34 A8.2 14 0 0 0 20 6 Z" fill="#f7ecd4"/>
+            <path d="M20 6 A14 14 0 0 1 20 34 A9.9 14 0 0 1 20 6 Z" fill="#f7ecd4"/>
             <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
           </svg>
-          <span class="work__tag">小游戏</span>
+          <span class="work__tag">小游戏 01</span>
         </div>
-        <h3 class="work__title">碎片时间的小玩意儿</h3>
+        <h3 class="work__title"><a class="work__link" href="games/moon-phase/">月相挑战</a></h3>
         <p class="work__desc">
-          打开就能玩、不用下载的小游戏合集。规则简单，但会在某个瞬间
-          突然变得不那么简单。
+          把月亮调成题目要的月相。十道题走完一个朔望月，顺带把
+          「上弦和下弦哪个亮在左边」这件事彻底记牢。
         </p>
-        <span class="work__status work__status--soon">筹备中</span>
+        <span class="work__status work__status--live">可玩</span>
+        <span class="work__cta" aria-hidden="true">开始玩 <span>→</span></span>
       </article>
 
       <article class="work">

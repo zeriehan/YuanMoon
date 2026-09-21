@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>这里没有东西 · 缘梦 YuanMoon</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#04060d">
+<meta name="color-scheme" content="dark">
+
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/styles/tokens.css">
+<link rel="stylesheet" href="/styles/base.css">
+<link rel="stylesheet" href="/styles/components.css">
+
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<div class="starfield" aria-hidden="true">
+  <div class="starfield__glow"></div>
+  <svg class="starfield__svg" id="starfield" preserveAspectRatio="none"></svg>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<main class="notfound">
+
+  <!-- 新月：整轮月亮只剩一条金线和一点地球反照。找不到页面时最合适的样子 -->
+  <p class="notfound__moon" aria-hidden="true">
+    <svg viewBox="0 0 400 400">
+      <defs>
+        <radialGradient id="moonHaloGradient404">
+          <stop offset="62%" stop-color="#f2c879" stop-opacity="0"/>
+          <stop offset="80%" stop-color="#f2c879" stop-opacity="0.22"/>
+          <stop offset="100%" stop-color="#f2c879" stop-opacity="0"/>
+        </radialGradient>
+        <radialGradient id="moonDark404" cx="36%" cy="30%" r="82%">
+          <stop offset="0%" stop-color="#1e2740"/>
+          <stop offset="70%" stop-color="#131a2c"/>
+          <stop offset="100%" stop-color="#0c1120"/>
+        </radialGradient>
+      </defs>
+      <circle cx="200" cy="200" r="198" fill="url(#moonHaloGradient404)"/>
+      <circle cx="200" cy="200" r="140" fill="url(#moonDark404)"/>
+      <circle cx="200" cy="200" r="140" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.5"/>
+    </svg>
+  </p>
+
+  <p class="eyebrow">404 · 空轨</p>
+  <h1>月亮走到了背面</h1>
+  <p class="notfound__lede">
+    你要找的页面不在这一侧。可能是地址打错了，也可能是它还没被做出来。
+  </p>
+
+  <div class="notfound__actions">
+    <a class="btn btn--primary" href="/">回缘梦</a>
+    <a class="btn btn--ghost" href="/games/moon-phase/">玩一局月相</a>
+  </div>
+</main>
+
+<script src="/scripts/main.js" defer></script>
+</body>
+</html>

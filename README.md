@@ -111,6 +111,15 @@ git add -A && git commit -m "改了什么" && git push
 放在 `games/<游戏名>/index.html`，首页卡片直接链过去。HTML5 小游戏通常几 MB，
 Cloudflare Pages 单文件 25MB 的限制完全够用。
 
+**已经上线：`games/moon-phase/` 月相挑战。** 十个回合，把月亮调到题目要的月相。
+它是首页那轮"只会从新月长到满月"的月亮的完整版 —— 主页只画盈月那半程，
+游戏里跑完整朔望月，亏月不做第二套几何，而是把亮面路径水平镜像
+（`transform="translate(400 0) scale(-1 1)"`，对 viewBox 的中心轴 x=200 严格对称）。
+
+模式有两个：**挑战**（十道题的靶心计分，朔/弦/望容差严、月牙/凸月容差宽）和
+**自由玩**（拖到哪儿报出哪儿的月相，用于认形状）。键盘左右方向键可微调，
+按住 Shift 是五倍步长。
+
 ### 小程序
 
 微信小程序不能托管在这里，只能放二维码或跳转链接。首页那张卡片目前是占位态。
@@ -136,21 +145,51 @@ Cloudflare Pages 单文件 25MB 的限制完全够用。
 
 ```
 start/
-├── index.html                 页面结构、文案、月相 SVG
+├── index.html                 品牌门户：首屏、缘起、作品、关于
+├── 404.html                   Cloudflare Pages 自动接管找不到的路径
+├── robots.txt / sitemap.xml   给搜索引擎的入口（换域名时要改）
 ├── styles/
 │   ├── tokens.css             设计令牌：颜色、字阶、间距、圆角、阴影、动效
 │   ├── base.css               字体声明、重置、排版基线、焦点、降级动效
-│   └── components.css         全部组件与构成
+│   └── components.css         全部组件与构成（含 404 页）
 ├── scripts/
 │   └── main.js                星场生成、月相计算、滚动入场、导航状态
+├── games/
+│   └── moon-phase/            小游戏 01：月相挑战
+│       ├── index.html         观测台 + 控制台
+│       ├── game.css           游戏页样式（复用 tokens/base/components）
+│       └── moon.js            完整的朔望月逻辑与计分
 ├── assets/
 │   ├── fonts/                 Cormorant Garamond 自托管 woff2（共约 92KB）
-│   └── img/favicon.svg
+│   └── img/
+│       ├── favicon.svg
+│       ├── og-card.svg        分享卡源文件（1200×630）
+│       └── og-card.png        分享卡成品，社交平台只认位图
 └── README.md
 ```
 
 **改颜色改字阶一律去 `tokens.css`**，组件层不写死色值。这样以后想换整体色调只需要
 动一个文件。
+
+> **域名占位提示**：全站现在按 `yuanmoon.me` 写死了三处绝对地址 ——
+> `index.html` 与 `games/moon-phase/index.html` 里的 `canonical` / `og:url` / `og:image`，
+> 以及 `robots.txt`、`sitemap.xml`。**如果最后领到的域名不是这个，这五处要一起换。**
+> 换漏了不会报错，只会让分享预览和搜索引擎收录默默失效。
+
+---
+
+## 五之二、再添一个小游戏
+
+1. 建 `games/<游戏名>/`，里面的页面从 `../../styles/tokens.css` 起加载样式 —— 设计令牌、
+   字体、按钮、卡片全部复用，视觉自然和主页一致。
+2. 新页面头部照抄 `games/moon-phase/index.html` 的 `<head>`（canonical + og 那一段），
+   记得改 URL。
+3. 首页 `index.html` 的 `.works` 里加一张卡：`<article class="work work--live">`，
+   标题里放 `<a class="work__link" href="games/xxx/">`。这个写法让**整张卡都能点，
+   但读屏软件念出来的仍然只有标题文字**（而不是"卡片 1 链接"）。
+4. 卡片图标的月相 = 进度。细月牙用 `A8.2 14 0 0 0`，盈凸月用 `A9.9 14 0 0 1`，
+   满月（做完）直接去掉亮面路径。
+5. 顺手往 `sitemap.xml` 里补一个 `<url>` 块。
 
 ---
 
@@ -189,3 +228,18 @@ SVG 路径。往下滚，它从新月一路长到满月，同时月晕一点点�
 | 卡片图标（月相） | 卡片里的 `work__phase` SVG，改 `fill` 深浅即可 |
 | 整体色调 | `styles/tokens.css` 顶部的色板 |
 | 月亮变圆的速度 | `scripts/main.js` 里的 `heroHeight * 0.82`，调大即变慢 |
+| 游戏题目数量 / 八个月相的名字 | `games/moon-phase/moon.js` 顶部的 `QUESTION_COUNT` 与 `PHASES` |
+| 游戏评分松紧 | 同文件的 `TOL`（六档容差） |
+| 分享卡（社交预览图） | 改 `assets/img/og-card.svg`，再按下方命令重渲染 PNG |
+
+分享卡是 SVG 画完再转成 PNG 的（社交平台不认 SVG），改完源文件后重跑：
+
+```bash
+"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" \
+  --headless=new --disable-gpu --hide-scrollbars --force-device-scale-factor=1 \
+  --user-data-dir="$TEMP/profile" --window-size=1200,630 --virtual-time-budget=8000 \
+  --screenshot="assets/img/og-card.png" \
+  "http://127.0.0.1:8137/assets/img/og-card.svg"
+```
+
+（需要本地预览服务已启动，SVG 里的 `@font-face` 走的是相对路径。）

@@ -662,6 +662,65 @@
   50%      { opacity: 1; }
 }
 
+/* 上线态：常亮的金点，不再是"还在等"的呼吸感 */
+.work__status--live {
+  border-color: var(--color-border-accent);
+  color: var(--color-accent);
+}
+.work__status--live::before { background: var(--color-accent); }
+
+/* ---- 可点的卡片 ----
+   整张卡片都是链接的命中区，但可访问名仍然是标题文字（而不是一串
+   "卡片 1 链接"）。做法是让标题里的 <a> 用 ::after 撑满整张卡片。 */
+.work--live { cursor: pointer; }
+
+.work__link {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-base) ease-out;
+}
+
+.work__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+}
+
+.work--live:hover .work__title,
+.work--live:focus-within .work__title {
+  color: var(--color-accent);
+}
+
+/* 键盘 Tab 到卡片时，给出和鼠标悬停一致的反馈 */
+.work--live:focus-within {
+  border-color: var(--color-border-accent);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-2), var(--glow-halo);
+}
+.work--live:focus-within::before { opacity: 1; }
+
+/* 「开始玩 →」：不进链接文本，只给眼睛一个"这儿能点"的信号 */
+.work__cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.work__cta span {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.work--live:hover .work__cta span,
+.work--live:focus-within .work__cta span {
+  transform: translateX(5px);
+}
+
 @media (max-width: 900px) {
   .works { grid-template-columns: 1fr; }
   .work:nth-child(n) { margin-top: 0; }
@@ -810,4 +869,52 @@
   .star { animation: none; opacity: 0.4; }
   .hero__cue-line::after { animation: none; transform: scaleX(1); }
   .work__status--soon::before { animation: none; opacity: 1; }
+}
+
+/* ======================================================================
+   7. 404：月亮走到背面
+   一页到底、居中、只有一轮看不见的月亮和两个出口。
+   ====================================================================== */
+.notfound {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5);
+  text-align: center;
+}
+
+.notfound__moon {
+  width: clamp(112px, 20vw, 176px);
+  margin-bottom: var(--space-3);
+}
+.notfound__moon svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.notfound h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-2xl);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-text);
+}
+
+.notfound__lede {
+  max-width: 32ch;
+  font-size: var(--fs-base);
+  line-height: 1.9;
+  color: var(--color-muted);
+}
+
+.notfound__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-4);
 }

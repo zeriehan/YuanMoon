@@ -1,0 +1,8 @@
+# 缘梦 YuanMoon · 一个纯静态的小站，全部内容都可以抓
+User-agent: *
+Allow: /
+
+# 404 页面本身没有收录价值
+Disallow: /404.html
+
+Sitemap: https://yuanmoon.me/sitemap.xml

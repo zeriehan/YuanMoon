@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  缘梦 YuanMoon · 站点地图
+  域名如果是别的（不是 yuanmoon.me），这里和 robots.txt 里的两条链接要一起改。
+  新增游戏后，往 <urlset> 里补一个 <url> 块即可。
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://yuanmoon.me/</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://yuanmoon.me/games/moon-phase/</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
