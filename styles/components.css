@@ -1,0 +1,813 @@
+/* ==========================================================================
+   缘梦 YuanMoon · 组件与构成
+   构成原则：非对称、重叠、破格。
+   首屏那轮月亮刻意冲出右侧画布边缘 —— 每屏都有一个元素逃出栅格。
+   ========================================================================== */
+
+/* ======================================================================
+   1. 氛围层：星场 + 颗粒
+   深空不能是平涂的近黑色，否则整站会显得廉价而空洞。
+   ====================================================================== */
+.starfield {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-stars);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.starfield__svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* 月晕：两团极淡的径向光，一团暖金（月亮的方向），一团冷蓝（地球反照） */
+.starfield__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(58rem 42rem at 82% 22%, rgba(242, 200, 121, 0.09), transparent 62%),
+    radial-gradient(48rem 40rem at 8% 78%, rgba(94, 116, 190, 0.11), transparent 60%);
+}
+
+.star {
+  fill: var(--moon-200);
+  animation: twinkle var(--twinkle-dur, 5s) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay, 0s);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: var(--star-min, 0.18); }
+  50%      { opacity: var(--star-max, 0.7); }
+}
+
+/* 颗粒：3% 的噪点，让深空有"胶片"的实体感，压住渐变的塑料味 */
+.grain {
+  position: fixed;
+  inset: 0;
+  /* 压在内容之上，连顶部导航一起覆盖，这样颗粒才是"整张照片"的颗粒。
+     3.5% 的强度不会影响任何文字的清晰度。 */
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ======================================================================
+   2. 顶部导航
+   ====================================================================== */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  /* 用显式的 width:100% + max-width 而不是 left/right 同时为 0 ——
+     后者在窄视口下会算出比视口更宽的盒子，把导航整个顶出屏幕。
+     品牌和导航靠 margin-right:auto 分流，比 space-between 更不容易被压缩逻辑干扰。 */
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--page-pad);
+  /* 滚动后才显形，首屏不抢月亮的戏 */
+  background: linear-gradient(180deg, rgba(4, 6, 13, 0.92), rgba(4, 6, 13, 0));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: transform var(--dur-base) var(--ease-out),
+              opacity var(--dur-base) var(--ease-out);
+}
+
+/* 页面未滚动时，导航是"轻"的；一旦滚动就实体化 */
+.site-header[data-scrolled="false"] {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-1) 0;
+  /* 把导航推到最右 */
+  margin-right: auto;
+}
+
+.brand__mark {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+.brand:hover .brand__mark {
+  transform: rotate(-18deg);
+}
+
+.brand__text {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.brand__cn {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.brand__en {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.site-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.site-nav__link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--fs-sm);
+  color: var(--color-text-soft);
+  letter-spacing: 0.08em;
+  transition: color var(--dur-fast) ease-out;
+}
+
+/* 悬停时下划线从左向右扫过，而不是整条变亮 */
+.site-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 12px;
+  width: 100%;
+  height: 1px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.site-nav__link:hover {
+  color: var(--color-text);
+}
+.site-nav__link:hover::after {
+  transform: scaleX(1);
+}
+
+/* 窄屏导航：这是整站最容易出问题的地方。
+   品牌名 + 三个中文链接挤在一行里，一旦 flex 压缩生效，中文会先断行、
+   再被挤出视口 —— 手机上就只剩一个入口了。所以这里明确禁止压缩，
+   并把间距和字号一起收一收，给 360px 宽的老设备也留足余量。 */
+@media (max-width: 640px) {
+  .site-header {
+    gap: var(--space-3);
+    padding: var(--space-3) var(--page-pad);
+  }
+  .brand,
+  .site-nav {
+    flex: none;
+  }
+  .brand {
+    gap: var(--space-2);
+  }
+  .brand__mark {
+    width: 26px;
+    height: 26px;
+  }
+  .brand__cn {
+    font-size: var(--fs-base);
+    letter-spacing: 0.08em;
+  }
+  .brand__en {
+    display: none;
+  }
+  .site-nav {
+    gap: var(--space-3);
+  }
+  .site-nav__link {
+    font-size: var(--fs-xs);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .site-nav__link::after {
+    bottom: 14px;
+  }
+}
+
+/* ======================================================================
+   3. 首屏
+   月亮右侧出血，文字从左侧压在月亮边缘上。
+   ====================================================================== */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  padding: calc(var(--space-8) + 40px) var(--page-pad) var(--space-7);
+  isolation: isolate;
+  /* 月亮要出血，但出血不能变成横向滚动条。
+     在 hero 这一层裁掉，比指望 body 的 overflow-x 兜底可靠得多。 */
+  overflow: hidden;
+}
+
+/* ---- 月亮 ------------------------------------------------------------- */
+.hero__moon {
+  position: absolute;
+  top: 50%;
+  /* 刻意冲出右侧画布：每屏都要有一个元素逃出栅格。
+     月亮直径约占元素宽度的 70%（viewBox 400 里圆的半径 140），
+     所以元素还要再往右推一截，裁掉的才是月亮本体而不是空白。 */
+  right: clamp(-240px, -16vw, -100px);
+  z-index: -1;
+  width: clamp(320px, 54vw, 780px);
+  aspect-ratio: 1 / 1;
+  /* 定位与视差统一交给 translate 属性，把 transform 和 scale 让给入场动画，
+     三者在浏览器里是独立的属性，不会互相覆盖。 */
+  translate: 0 calc(-50% + var(--moon-parallax, 0px));
+  will-change: translate;
+}
+
+.hero__moon-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* 月晕：月亮外圈那层柔和的光，随相位增亮。
+   初始值不能太低 —— 新月时整轮月亮只有暗面，全靠这圈光和金边把轮廓托出来。 */
+.moon__halo {
+  fill: none;
+  opacity: var(--halo-opacity, 0.2);
+  transition: opacity var(--dur-base) linear;
+}
+
+/* 整个月盘：亮面随相位扩张，暗面始终可辨（真实月亮就是这样） */
+.moon__lit {
+  fill: url(#moonLit);
+}
+.moon__earthshine {
+  /* 填充由 HTML 里的 moonDark 径向渐变提供 —— 地球反照的微光 */
+  fill: url(#moonDark);
+}
+
+.hero__moon-caption {
+  position: absolute;
+  left: 50%;
+  bottom: -6%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+  white-space: nowrap;
+}
+.hero__moon-caption b {
+  color: var(--color-accent);
+  font-weight: 400;
+}
+
+/* ---- 首屏文字 --------------------------------------------------------- */
+.hero__text {
+  position: relative;
+  z-index: 1;
+  max-width: 34rem;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.hero__title {
+  display: grid;
+  gap: 0;
+  line-height: 0.9;
+}
+
+.hero__title-cn {
+  font-family: var(--font-display);
+  font-size: var(--fs-display);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  /* 中文标题给一点宽度变体感：字距拉开，像星图上的标注 */
+}
+
+.hero__title-en {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.5rem, 4.4vw, 3rem);
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+  margin-top: calc(var(--space-1) * -1);
+}
+
+.hero__lede {
+  font-size: var(--fs-md);
+  line-height: 1.85;
+  color: var(--color-text-soft);
+  max-width: 26em;
+}
+
+.hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+.hero__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.hero__meta span::before {
+  content: "";
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-accent-deep);
+}
+
+/* ---- 按钮 ------------------------------------------------------------- */
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius-full);
+  border: 1px solid transparent;
+  font-size: var(--fs-sm);
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) ease-out,
+              border-color var(--dur-fast) ease-out,
+              color var(--dur-fast) ease-out,
+              transform var(--dur-fast) ease-out;
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  background: var(--color-accent);
+  color: var(--ink-950);
+  font-weight: 500;
+}
+.btn--primary:hover {
+  background: var(--color-accent-soft);
+}
+
+.btn--ghost {
+  border-color: var(--color-border-strong);
+  color: var(--color-text-soft);
+}
+.btn--ghost:hover {
+  border-color: var(--color-border-accent);
+  color: var(--color-text);
+  background: rgba(242, 200, 121, 0.06);
+}
+
+/* 禁用态：整个站点的按钮都可能有这一态 */
+.btn[aria-disabled="true"],
+.btn:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---- 滚动提示 --------------------------------------------------------- */
+.hero__cue {
+  position: absolute;
+  left: var(--page-pad);
+  bottom: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+.hero__cue-line {
+  position: relative;
+  width: 56px;
+  height: 1px;
+  background: var(--color-border-strong);
+  overflow: hidden;
+}
+.hero__cue-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-accent);
+  transform-origin: left;
+  animation: sweep 2.6s var(--ease-inout) infinite;
+}
+@keyframes sweep {
+  0%   { transform: scaleX(0); }
+  45%  { transform: scaleX(1); }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    align-content: start;
+    min-height: auto;
+    padding: calc(var(--space-7) + 48px) var(--page-pad) var(--space-7);
+    gap: var(--space-4);
+  }
+  /* 小屏上让月亮回到文档流、单独占一块 ——
+     375px 宽的屏幕上，月亮一旦和文字重叠就一定读不清 */
+  .hero__moon {
+    position: relative;
+    top: auto;
+    right: auto;
+    translate: none;
+    justify-self: center;
+    width: min(58vw, 250px);
+    z-index: 0;
+  }
+  .hero__text { max-width: none; }
+  .hero__lede { font-size: var(--fs-base); }
+  .hero__moon-caption { display: none; }
+  .hero__cue { display: none; }
+}
+
+/* ======================================================================
+   4. 区块通用骨架
+   ====================================================================== */
+.section {
+  position: relative;
+  z-index: var(--z-content);
+  padding: var(--space-8) var(--page-pad);
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.section__head {
+  display: grid;
+  gap: var(--space-3);
+  margin-bottom: var(--space-7);
+  max-width: 42rem;
+}
+
+/* 发丝分割线：从标题右侧延伸出去，制造"未完成"的横向动势 */
+.section__rule {
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-border-strong), transparent);
+  margin-bottom: var(--space-6);
+}
+
+/* ======================================================================
+   5. 缘起：名字释义
+   四个字，用非对称网格排，不复用同一张卡片模板。
+   ====================================================================== */
+.gloss {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-5) var(--space-4);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.gloss__item {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+/* 刻意错落：四个字不在同一水平线上。
+   第 3 个的负 margin 只给 -40px —— 给太多的话，以后文案一改长就会压到上面一行。 */
+.gloss__item:nth-child(1) { grid-column: 1 / span 5; }
+.gloss__item:nth-child(2) { grid-column: 7 / span 5; margin-top: var(--space-7); }
+.gloss__item:nth-child(3) { grid-column: 2 / span 5; margin-top: calc(var(--space-5) * -1); }
+.gloss__item:nth-child(4) { grid-column: 8 / span 5; margin-top: var(--space-5); }
+
+.gloss__glyph {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 9vw, 7rem);
+  font-weight: 400;
+  line-height: 0.85;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-border-strong);
+  transition: -webkit-text-stroke-color var(--dur-base) ease-out,
+              color var(--dur-base) ease-out;
+}
+.gloss__item:hover .gloss__glyph {
+  -webkit-text-stroke-color: var(--color-accent);
+  color: rgba(242, 200, 121, 0.06);
+}
+
+.gloss__item h3 {
+  font-size: var(--fs-md);
+  letter-spacing: 0.14em;
+  color: var(--color-text);
+}
+
+.gloss__item p {
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+  color: var(--color-muted);
+}
+
+@media (max-width: 900px) {
+  .gloss { grid-template-columns: 1fr; gap: var(--space-6); }
+  .gloss__item,
+  .gloss__item:nth-child(n) {
+    grid-column: auto;
+    margin-top: 0;
+  }
+  .gloss__glyph { font-size: 3.5rem; }
+}
+
+/* ======================================================================
+   6. 作品：三张入口卡片
+   卡片用月相做图标 —— 月相即进度，占位态是"新月"，上线后"转满"。
+   ====================================================================== */
+.works {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+.work {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: linear-gradient(180deg, var(--color-surface), var(--ink-850));
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--dur-base) ease-out,
+              transform var(--dur-base) var(--ease-out),
+              box-shadow var(--dur-base) ease-out;
+}
+
+/* 卡片倒错：三张不在一条水平线上 */
+.work:nth-child(2) { margin-top: var(--space-6); }
+.work:nth-child(3) { margin-top: var(--space-3); }
+
+.work:hover {
+  border-color: var(--color-border-accent);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-2), var(--glow-halo);
+}
+
+/* 悬停时从右上角洇开一层极淡的金色 */
+.work::before {
+  content: "";
+  position: absolute;
+  top: -40%;
+  right: -30%;
+  width: 70%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 200, 121, 0.16), transparent 68%);
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out);
+  pointer-events: none;
+}
+.work:hover::before {
+  opacity: 1;
+}
+
+.work__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.work__phase {
+  width: 40px;
+  height: 40px;
+  flex: none;
+}
+
+.work__tag {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+}
+
+.work__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+}
+
+.work__desc {
+  font-size: var(--fs-sm);
+  line-height: 1.85;
+  color: var(--color-muted);
+}
+
+.work__status {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: 5px var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+.work__status::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.work__status--soon::before {
+  background: var(--color-accent);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  .works { grid-template-columns: 1fr; }
+  .work:nth-child(n) { margin-top: 0; }
+}
+
+/* ======================================================================
+   7. 关于 + 页脚
+   ====================================================================== */
+.about {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: start;
+}
+
+.about__body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.about__body p {
+  font-size: var(--fs-base);
+  line-height: 1.95;
+  color: var(--color-text-soft);
+}
+
+/* 观测数据式的清单，左侧发丝线 */
+.about__facts {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  border-top: 1px solid var(--color-border);
+}
+.about__facts > div {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: var(--space-4);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.about__facts dt {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-faint);
+  padding-top: 4px;
+}
+.about__facts dd {
+  font-size: var(--fs-sm);
+  color: var(--color-text-soft);
+}
+
+@media (max-width: 900px) {
+  .about { grid-template-columns: 1fr; gap: var(--space-6); }
+}
+
+.site-footer {
+  position: relative;
+  z-index: var(--z-content);
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-6) var(--page-pad) var(--space-7);
+  max-width: var(--page-max);
+  margin: var(--space-7) auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.site-footer__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  letter-spacing: 0.1em;
+}
+
+.site-footer__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: var(--color-faint);
+  text-align: right;
+  line-height: 2;
+}
+
+/* ======================================================================
+   8. 入场编排
+   一次编排好的序列（间隔 90ms）胜过满屏零散的微交互。
+   只有首屏参与，滚动进入的区块交给 IntersectionObserver。
+   ====================================================================== */
+.hero__text > * {
+  opacity: 0;
+  animation: rise var(--dur-slow) var(--ease-out) forwards;
+}
+.hero__text > *:nth-child(1) { animation-delay: 120ms; }
+.hero__text > *:nth-child(2) { animation-delay: 210ms; }
+.hero__text > *:nth-child(3) { animation-delay: 300ms; }
+.hero__text > *:nth-child(4) { animation-delay: 390ms; }
+.hero__text > *:nth-child(5) { animation-delay: 480ms; }
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(26px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.hero__moon {
+  opacity: 0;
+  scale: 0.92;
+  animation: moonIn 1.4s var(--ease-out) 80ms forwards;
+}
+@keyframes moonIn {
+  from { opacity: 0; scale: 0.92; }
+  to   { opacity: 1; scale: 1; }
+}
+
+/* 滚动进入的区块。
+   只有确认脚本可用（html.js）时才初始隐藏 —— 否则禁用 JS 的用户
+   会看到一整片空白页面。 */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+.js .reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__text > *,
+  .hero__moon {
+    opacity: 1;
+    scale: 1;
+    animation: none;
+  }
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .star { animation: none; opacity: 0.4; }
+  .hero__cue-line::after { animation: none; transform: scaleX(1); }
+  .work__status--soon::before { animation: none; opacity: 1; }
+}

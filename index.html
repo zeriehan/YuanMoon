@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>缘梦 YuanMoon · 起点与圆满</title>
+<meta name="description" content="缘梦 YuanMoon —— 一个人的小站。放我自己做的小游戏、正在啃的时空与相对论，还有一些还不知道会长成什么样的念头。">
+<meta name="theme-color" content="#04060d">
+<meta name="color-scheme" content="dark">
+
+<!-- 分享卡片：以后发出去至少有个像样的预览 -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="缘梦 YuanMoon">
+<meta property="og:description" content="起点与圆满。一个人的小站。">
+<meta property="og:locale" content="zh_CN">
+
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/img/favicon.svg">
+
+<!-- 关键 CSS 顺序加载：令牌 → 基础 → 组件 -->
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/components.css">
+
+<!-- 标记"脚本可用"。滚动入场效果依赖它：万一 JS 挂了或用户禁用脚本，
+     页面依然完整可读，而不是留下一片永远不出现的空白。 -->
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">跳到主要内容</a>
+
+<!-- 氛围层：星场与颗粒。纯装饰，对辅助技术隐藏 -->
+<div class="starfield" aria-hidden="true">
+  <div class="starfield__glow"></div>
+  <svg class="starfield__svg" id="starfield" preserveAspectRatio="none"></svg>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header" data-scrolled="false" id="siteHeader">
+  <a class="brand" href="#top" aria-label="缘梦 YuanMoon 首页">
+    <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="15" fill="none" stroke="#f2c879" stroke-width="1.2" opacity="0.55"/>
+      <path d="M20 5 A15 15 0 0 1 20 35 A9 15 0 0 1 20 5 Z" fill="#fbeccc"/>
+    </svg>
+    <span class="brand__text">
+      <span class="brand__cn">缘梦</span>
+      <span class="brand__en">YuanMoon</span>
+    </span>
+  </a>
+
+  <nav class="site-nav" aria-label="主导航">
+    <a class="site-nav__link" href="#origin">缘起</a>
+    <a class="site-nav__link" href="#works">作品</a>
+    <a class="site-nav__link" href="#about">关于</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- ==================== 首屏 ==================== -->
+  <section class="hero" id="top" aria-labelledby="heroTitle">
+
+    <!-- 一轮会随滚动变圆的月亮。它刻意冲出右侧画布边缘。 -->
+    <div class="hero__moon" id="heroMoon" aria-hidden="true">
+      <svg class="hero__moon-svg" viewBox="0 0 400 400">
+        <defs>
+          <!-- 月晕：月亮外圈那层柔光 -->
+          <radialGradient id="moonHaloGradient">
+            <stop offset="62%" stop-color="#f2c879" stop-opacity="0"/>
+            <stop offset="80%" stop-color="#f2c879" stop-opacity="0.30"/>
+            <stop offset="100%" stop-color="#f2c879" stop-opacity="0"/>
+          </radialGradient>
+          <!-- 亮面：左上方受光，右下方转为暖金，模拟满月的实感 -->
+          <radialGradient id="moonLit" cx="36%" cy="32%" r="76%">
+            <stop offset="0%" stop-color="#fffdf7"/>
+            <stop offset="55%" stop-color="#f7ecd4"/>
+            <stop offset="100%" stop-color="#d6b986"/>
+          </radialGradient>
+          <!-- 暗面：地球反照。新月时整轮月亮只剩这层极暗的球体轮廓，
+               靠左上的微光透出体积，比纯色圆盘像月亮得多 -->
+          <radialGradient id="moonDark" cx="36%" cy="30%" r="82%">
+            <stop offset="0%" stop-color="#1e2740"/>
+            <stop offset="70%" stop-color="#131a2c"/>
+            <stop offset="100%" stop-color="#0c1120"/>
+          </radialGradient>
+        </defs>
+
+        <circle class="moon__halo" cx="200" cy="200" r="198" fill="url(#moonHaloGradient)"/>
+        <!-- 暗面：始终可见的月盘 -->
+        <circle class="moon__earthshine" cx="200" cy="200" r="140" fill="url(#moonDark)"/>
+        <!-- 亮面：由脚本按相位重算路径 -->
+        <path class="moon__lit" id="moonLitPath" d=""/>
+        <!-- 月盘外缘：一条金线，让新月时也看得出这是一轮月 -->
+        <circle cx="200" cy="200" r="140" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+      </svg>
+      <p class="hero__moon-caption">月相 <b id="moonPhaseLabel">00</b>%</p>
+    </div>
+
+    <div class="hero__text">
+      <p class="eyebrow">YuanMoon · 缘梦</p>
+
+      <h1 class="hero__title" id="heroTitle">
+        <span class="hero__title-cn">缘梦</span>
+        <span class="hero__title-en" lang="en">YuanMoon</span>
+      </h1>
+
+      <p class="hero__lede">
+        这里放我自己做的小游戏、正在啃的时空与相对论，
+        还有一些还不知道会长成什么样的念头。
+      </p>
+
+      <ul class="hero__meta" role="list">
+        <li><span>小游戏</span></li>
+        <li><span>时空模拟</span></li>
+        <li><span>独立开发</span></li>
+      </ul>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href="#works">看作品</a>
+        <a class="btn btn--ghost" href="#origin">名字的由来</a>
+      </div>
+    </div>
+
+    <p class="hero__cue" aria-hidden="true">
+      <span class="hero__cue-line"></span>
+      向下滚动
+    </p>
+  </section>
+
+  <!-- ==================== 缘起 ==================== -->
+  <section class="section reveal" id="origin" aria-labelledby="originTitle">
+    <div class="section__head">
+      <p class="eyebrow">01 / 缘起</p>
+      <h2 id="originTitle">两个字，四种读法</h2>
+      <p class="hero__lede" style="font-size:var(--fs-base);color:var(--color-muted)">
+        取名字的时候发现，把「缘」和「梦」放在一起，读音正好落在 moon 上。
+        于是这个名字自己长出了一轮月亮。
+      </p>
+    </div>
+
+    <ul class="gloss" role="list">
+      <li class="gloss__item">
+        <span class="gloss__glyph" aria-hidden="true">缘</span>
+        <h3>缘 · 起点</h3>
+        <p>
+          所有东西都开始于一个还没想清楚的念头。不是因为想明白了才做，
+          而是做完才发现，原来一开始就在等的就是它。
+        </p>
+      </li>
+      <li class="gloss__item">
+        <span class="gloss__glyph" aria-hidden="true">元</span>
+        <h3>元 · 圆</h3>
+        <p>
+          元是开始，也是圆。月亮绕一整圈会回到出发的那一点，
+          可它已经不是原来那轮月亮了 —— 人做事大概也是这样。
+        </p>
+      </li>
+      <li class="gloss__item">
+        <span class="gloss__glyph" aria-hidden="true">梦</span>
+        <h3>梦 · 做出来</h3>
+        <p>
+          梦是白天没说完的那部分。做游戏，就是把手心里那点想象
+          捏成一个别人也能走进去的地方。
+        </p>
+      </li>
+      <li class="gloss__item">
+        <span class="gloss__glyph" aria-hidden="true">月</span>
+        <h3>月 · 记号</h3>
+        <p>
+          圆月是这里的记号。它每天都在变，从一线到圆满再回到一线，
+          但你一眼就能认出来那是同一轮月亮。
+        </p>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ==================== 作品 ==================== -->
+  <section class="section reveal" id="works" aria-labelledby="worksTitle">
+    <div class="section__head">
+      <p class="eyebrow">02 / 作品</p>
+      <h2 id="worksTitle">正在建造的东西</h2>
+      <p class="hero__lede" style="font-size:var(--fs-base);color:var(--color-muted)">
+        每张卡片的图标是一枚月相。它现在是什么形状，进度就是什么样 ——
+        新的还没亮起来，做完的会转成满月。
+      </p>
+    </div>
+
+    <div class="works">
+      <article class="work">
+        <div class="work__head">
+          <!-- 月相即进度：这张是约 15% 的细月牙，对应"筹备中" -->
+          <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="14" fill="#131a2c"/>
+            <path d="M20 6 A14 14 0 0 1 20 34 A8.2 14 0 0 0 20 6 Z" fill="#f7ecd4"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+          </svg>
+          <span class="work__tag">小游戏</span>
+        </div>
+        <h3 class="work__title">碎片时间的小玩意儿</h3>
+        <p class="work__desc">
+          打开就能玩、不用下载的小游戏合集。规则简单，但会在某个瞬间
+          突然变得不那么简单。
+        </p>
+        <span class="work__status work__status--soon">筹备中</span>
+      </article>
+
+      <article class="work">
+        <div class="work__head">
+          <!-- 约 12% 的细月牙，对应"构思中"；比左卡细、比右卡有内容 -->
+          <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="14" fill="#131a2c"/>
+            <path d="M20 6 A14 14 0 0 1 20 34 A10.2 14 0 0 0 20 6 Z" fill="#c3cadb"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+          </svg>
+          <span class="work__tag">大游戏 · 时空</span>
+        </div>
+        <h3 class="work__title">把光速调慢给你看</h3>
+        <p class="work__desc">
+          一个关于狭义相对论的游戏。当光速不再是每秒三十万公里，
+          时间会怎样被拉长，空间又会怎样被压扁 —— 我想让你亲手转一下这个旋钮。
+        </p>
+        <span class="work__status work__status--soon">构思中</span>
+      </article>
+
+      <article class="work">
+        <div class="work__head">
+          <!-- 新月：还没亮起来，对应"待定" -->
+          <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="14" fill="#131a2c"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+          </svg>
+          <span class="work__tag">小程序 · 试验</span>
+        </div>
+        <h3 class="work__title">随手能用的小工具</h3>
+        <p class="work__desc">
+          微信里就能用的小东西。目前还是一张白纸，等哪个念头先长成形。
+        </p>
+        <span class="work__status">待定</span>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==================== 关于 ==================== -->
+  <section class="section reveal" id="about" aria-labelledby="aboutTitle">
+    <div class="section__head">
+      <p class="eyebrow">03 / 关于</p>
+      <h2 id="aboutTitle">一个人，一台电脑</h2>
+    </div>
+
+    <div class="about">
+      <div class="about__body">
+        <p>
+          缘梦是一个人维护的小站。没有团队，也没有排期表，
+          做到哪算哪，但每一件放上来的东西都自己从头写过。
+        </p>
+        <p>
+          我着迷于两件事：一是把复杂的东西拆到能被一双手摸明白，
+          二是让这件事本身变得好玩。小游戏是前者，时空模拟是后者，
+          而这个站是它们的门口。
+        </p>
+        <p>
+          如果哪天你想聊聊相对论、聊聊游戏，或者只是路过看看月亮，
+          都随时。
+        </p>
+      </div>
+
+      <dl class="about__facts">
+        <div>
+          <dt>名字</dt>
+          <dd>缘梦 · YuanMoon</dd>
+        </div>
+        <div>
+          <dt>记号</dt>
+          <dd>圆月 · 月相盈亏</dd>
+        </div>
+        <div>
+          <dt>建造</dt>
+          <dd>纯手写 HTML / CSS / JS，无框架无构建</dd>
+        </div>
+        <div>
+          <dt>安置</dt>
+          <dd>Cloudflare Pages · 静态托管</dd>
+        </div>
+        <div>
+          <dt>更新</dt>
+          <dd>想到就写</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <span class="site-footer__brand">
+    <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
+      <circle cx="20" cy="20" r="15" fill="none" stroke="#f2c879" stroke-width="1.2" opacity="0.55"/>
+      <path d="M20 5 A15 15 0 0 1 20 35 A9 15 0 0 1 20 5 Z" fill="#fbeccc"/>
+    </svg>
+    缘梦
+  </span>
+  <p class="site-footer__meta">
+    © 2026 YuanMoon<br>
+    以月亮为记
+  </p>
+</footer>
+
+<script src="scripts/main.js" defer></script>
+</body>
+</html>

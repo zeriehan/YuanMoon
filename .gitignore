@@ -1,0 +1,17 @@
+# 缘梦 YuanMoon · 站点的东西全都手写，所以忽略清单很短
+
+# 编辑器与系统
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# 本地临时预览
+*.log
+.tmp/
+
+# WorkBuddy 项目工作数据（记忆、验收副本等），属于本地，不随站点发布
+.workbuddy/
+__check-*

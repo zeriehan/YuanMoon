@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="缘梦 YuanMoon">
+  <!-- 深空底 -->
+  <rect width="32" height="32" rx="7" fill="#04060d"/>
+  <!-- 暗月盘 -->
+  <circle cx="16" cy="16" r="10.5" fill="#131a2c"/>
+  <!-- 亮面：约 78% 相位，接近满月但保留一线缺口，正对应"缘"字的未完成 -->
+  <path d="M16 5.5 A10.5 10.5 0 0 1 16 26.5 A8.2 10.5 0 0 1 16 5.5 Z" fill="#f7ecd4"/>
+  <!-- 月盘外缘 -->
+  <circle cx="16" cy="16" r="10.5" fill="none" stroke="#f2c879" stroke-width="0.9" opacity="0.65"/>
+</svg>

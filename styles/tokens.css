@@ -1,0 +1,117 @@
+/* ==========================================================================
+   缘梦 YuanMoon · 设计令牌
+   --------------------------------------------------------------------------
+   定调：深空天文台的克制语言。
+   一块近黑的深空底（主色 60%），月白与灰阶承载全部文字（辅助 30%），
+   月华金只留给真正需要被看见的地方 —— 强调、当前状态、可点击（10%）。
+   全部颜色、字阶、间距集中在此文件，组件层禁止硬编码色值。
+   ========================================================================== */
+
+:root {
+  /* ---- 深空：主色，铺满整个页面 ---------------------------------------- */
+  --ink-950: #04060d;
+  --ink-900: #080c17;
+  --ink-850: #0b101d;
+  --ink-800: #0e1424;
+  --ink-700: #161d31;
+  --ink-600: #212a42;
+  --ink-500: #303c58;
+
+  /* ---- 月白与灰阶：辅助色，所有文字从这组里取 -------------------------- */
+  --moon-50:  #f7f9fc;
+  --moon-100: #eef1f8;
+  --moon-200: #dde3f0;
+  --moon-300: #c3cadb;
+  --moon-500: #8b95af;
+  --moon-600: #6d7794;
+  --moon-700: #4c5673;
+
+  /* ---- 月华金：强调色，单页只用这一个 ---------------------------------- */
+  --halo-100: #fbeccc;
+  --halo-300: #f2c879;
+  --halo-500: #d9a850;
+  --halo-700: #9a7130;
+
+  /* ====================== 语义别名（组件只认这一层） ===================== */
+  --color-bg:            var(--ink-950);
+  --color-bg-deep:       var(--ink-900);
+  --color-surface:       var(--ink-800);
+  --color-surface-2:     var(--ink-700);
+  --color-surface-hover: var(--ink-600);
+
+  --color-text:          var(--moon-100);
+  --color-text-soft:     var(--moon-300);
+  --color-muted:         var(--moon-500);
+  --color-faint:         var(--moon-700);
+
+  --color-accent:        var(--halo-300);
+  --color-accent-soft:   var(--halo-100);
+  --color-accent-deep:   var(--halo-700);
+
+  --color-border:        rgba(195, 202, 219, 0.10);
+  --color-border-strong: rgba(195, 202, 219, 0.22);
+  --color-border-accent: rgba(242, 200, 121, 0.34);
+
+  /* ============================ 字体系统 =================================
+     展示字：Cormorant Garamond —— 高对比度衬线，笔画像星图上的刻线。
+             中文标题回落到宋体栈，同样保留衬线的古典感。
+     正文字：系统中文字体栈 —— 中文正文优先渲染质量，不用 Web Font。
+     ======================================================================= */
+  --font-display: "Cormorant Garamond", "Songti SC", "Source Han Serif SC",
+                  "Noto Serif CJK SC", "SimSun", Georgia, serif;
+  --font-body:    "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei",
+                  "Hiragino Sans GB", "Segoe UI", system-ui, sans-serif;
+  --font-mono:    "SFMono-Regular", "JetBrains Mono", Consolas,
+                  "Liberation Mono", Menlo, monospace;
+
+  /* ============================ 字阶（1.25） ============================= */
+  --fs-xs:   0.75rem;
+  --fs-sm:   0.875rem;
+  --fs-base: 1rem;
+  --fs-md:   1.25rem;
+  --fs-lg:   1.5625rem;
+  --fs-xl:   1.9531rem;
+  --fs-2xl:  2.4414rem;
+  --fs-3xl:  3.0518rem;
+
+  /* 首屏与区块标题用流体字阶，小屏不挤、大屏不空 */
+  --fs-display: clamp(3.25rem, 13vw, 9.5rem);
+  --fs-section: clamp(1.75rem, 4.2vw, 3.25rem);
+
+  /* ============================ 间距梯度 ================================ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 40px;
+  --space-6: 64px;
+  --space-7: 96px;
+  --space-8: 144px;
+
+  --page-max: 1200px;
+  --page-pad: clamp(20px, 5vw, 64px);
+
+  /* ============================ 圆角 ==================================== */
+  --radius-sm: 4px;
+  --radius-md: 10px;
+  --radius-lg: 20px;
+  --radius-full: 999px;
+
+  /* ======================= 阴影（带环境色，而非纯黑） =================== */
+  --shadow-1: 0 2px 8px rgba(2, 4, 10, 0.45);
+  --shadow-2: 0 8px 28px rgba(2, 4, 10, 0.55);
+  --shadow-3: 0 24px 64px rgba(2, 4, 10, 0.65);
+  --glow-halo: 0 0 48px rgba(242, 200, 121, 0.16);
+
+  /* ============================ 动效 ==================================== */
+  --ease-out:   cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 170ms;
+  --dur-base: 340ms;
+  --dur-slow: 680ms;
+
+  /* 层级 */
+  --z-stars: 0;
+  --z-content: 1;
+  --z-header: 50;
+}
