@@ -550,7 +550,8 @@
    ====================================================================== */
 .works {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* 四张卡：2×2 比 3+1 稳。3 列会让第四张单独落在第二行，很难看 */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
   align-items: start;
 }
@@ -569,9 +570,10 @@
               box-shadow var(--dur-base) ease-out;
 }
 
-/* 卡片倒错：三张不在一条水平线上 */
+/* 卡片倒错：不在一条水平线上。2×2 下按 左上→右上→左下→右下 走 */
 .work:nth-child(2) { margin-top: var(--space-6); }
-.work:nth-child(3) { margin-top: var(--space-3); }
+.work:nth-child(3) { margin-top: var(--space-2); }
+.work:nth-child(4) { margin-top: var(--space-5); }
 
 .work:hover {
   border-color: var(--color-border-accent);

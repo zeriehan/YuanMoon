@@ -1,0 +1,437 @@
+/* ==========================================================================
+   光路挑战 · 页面样式
+   和月相挑战共用同一套令牌与基调，但布局反过来：
+   月亮是"看 + 调"，所以左右分栏；光线是"看 + 拖"，需要一块宽台面，
+   所以上面是光学台、下面是横向控制条。
+   ========================================================================== */
+
+body {
+  background-image: none;
+}
+
+/* ============================ 顶部栏 ================================== */
+.game-bar {
+  position: relative;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--page-pad);
+  max-width: var(--page-max);
+  margin: 0 auto;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.game-bar__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  letter-spacing: 0.1em;
+  transition: color var(--dur-fast) ease-out;
+}
+.game-bar__back span {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--color-accent);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.game-bar__back:hover { color: var(--color-accent-soft); }
+.game-bar__back:hover span { transform: translateX(-4px); }
+
+/* 选关条：它同时也是"这是第几关"的进度显示 */
+.lvnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-left: auto;
+}
+
+.lvnav__btn {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.12em;
+  color: var(--color-faint);
+  cursor: pointer;
+  transition: color var(--dur-fast) ease-out,
+              border-color var(--dur-fast) ease-out,
+              background-color var(--dur-fast) ease-out;
+}
+.lvnav__btn:hover {
+  color: var(--color-text-soft);
+  border-color: var(--color-border-strong);
+}
+.lvnav__btn.is-on {
+  color: var(--color-accent);
+  border-color: var(--color-border-accent);
+  background: rgba(242, 200, 121, 0.08);
+}
+.lvnav__btn.is-clear {
+  color: var(--color-text-soft);
+}
+.lvnav__btn.is-clear::after {
+  content: " ✓";
+  color: var(--color-accent);
+}
+
+/* ============================ 主布局 ================================== */
+.game {
+  position: relative;
+  z-index: var(--z-content);
+  display: grid;
+  gap: var(--space-5);
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--page-pad) var(--space-6);
+}
+
+/* ============================ 光学台 ================================== */
+.bench {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
+}
+
+.bench__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(30, 39, 64, 0.55), transparent 70%),
+    linear-gradient(180deg, var(--ink-900), var(--ink-950));
+  touch-action: none;          /* 拖元件时不要顺手滚页面 */
+  cursor: default;
+  overflow: hidden;            /* 光线画到台面边缘为止，这里再兜一层 */
+}
+
+/* 台面网格：给"空间"一个参照，不然光路没有量级感 */
+.grid-line {
+  stroke: rgba(195, 202, 219, 0.055);
+  stroke-width: 1;
+}
+.grid-line--major {
+  stroke: rgba(195, 202, 219, 0.10);
+}
+
+/* ---------------------------- 元件 ------------------------------------ */
+.opt { cursor: grab; }
+.opt.is-drag { cursor: grabbing; }
+
+/* 镜面：正面一条实线，背面一排斜线表示"这面是反光面" */
+.opt__face {
+  stroke: #dfe4ee;
+  stroke-width: 4;
+  stroke-linecap: round;
+  fill: none;
+}
+.opt__back {
+  stroke: rgba(195, 202, 219, 0.32);
+  stroke-width: 1.5;
+  fill: none;
+}
+
+/* 玻璃砖 / 水池：半透明填充 + 描边，看得出这是"介质" */
+.opt__body {
+  fill: rgba(150, 200, 235, 0.10);
+  stroke: rgba(178, 214, 240, 0.55);
+  stroke-width: 1.5;
+}
+.opt__body--water {
+  fill: rgba(120, 190, 220, 0.13);
+  stroke: rgba(160, 214, 238, 0.6);
+}
+.opt__tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  fill: var(--color-faint);
+}
+
+/* 光源 */
+.opt__lamp {
+  fill: url(#lampGrad);
+  stroke: rgba(255, 253, 247, 0.55);
+  stroke-width: 1;
+}
+.opt__dir {
+  stroke: var(--color-accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: none;
+}
+.opt__dirhead {
+  fill: var(--color-accent);
+}
+
+/* 命中区：视觉上的线很细，命中区要够大才好点。
+   移动端整块台面只有四百来像素宽，26 用户单位折算下来不到 13px，
+   手指根本点不准，所以给到 34。 */
+.opt__hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 34;
+  pointer-events: stroke;
+}
+
+.opt.is-on .opt__face { stroke: var(--color-accent); }
+.opt.is-on .opt__body { stroke: var(--color-accent); }
+
+/* 旋转手柄：拖它改角度 */
+.handle {
+  fill: var(--color-accent);
+  stroke: var(--ink-950);
+  stroke-width: 2;
+  cursor: grab;
+  pointer-events: all;
+}
+.handle.is-drag { cursor: grabbing; }
+.handle__arm {
+  stroke: var(--color-border-accent);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+.handle__ring {
+  fill: none;
+  stroke: rgba(242, 200, 121, 0.22);
+  stroke-width: 1;
+  stroke-dasharray: 2 6;
+}
+
+/* ---------------------------- 光路 ------------------------------------ */
+.beam {
+  fill: none;
+  stroke: url(#beamGrad);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 5px rgba(242, 200, 121, 0.35));
+}
+/* 在介质里走的那几段压暗一点 —— 一眼看出光"进了水/玻璃" */
+.beam--in {
+  stroke: rgba(242, 200, 121, 0.45);
+  stroke-dasharray: 7 5;
+}
+.beam-dot {
+  fill: #fffdf7;
+  filter: drop-shadow(0 0 6px rgba(242, 200, 121, 0.7));
+}
+
+/* 事件标记：全反射是这一关的主角，标出来 */
+.mark__dot {
+  fill: #fffdf7;
+  stroke: var(--ink-950);
+  stroke-width: 1.5;
+}
+.mark__label {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  fill: var(--color-text-soft);
+  paint-order: stroke;
+  stroke: rgba(4, 6, 13, 0.85);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+/* ---------------------------- 靶心 ------------------------------------ */
+.target__ring {
+  fill: none;
+  stroke: var(--color-faint);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 6;
+}
+.target__core {
+  fill: none;
+  stroke: rgba(195, 202, 219, 0.35);
+  stroke-width: 1;
+}
+.target.is-hit .target__ring {
+  stroke: var(--color-accent);
+  stroke-dasharray: none;
+  stroke-width: 2;
+}
+.target__glow {
+  fill: var(--color-accent);
+  opacity: 0;
+  transition: opacity var(--dur-slow) ease-out;
+}
+.target.is-hit .target__glow { opacity: 0.16; }
+
+.target__flag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  fill: var(--color-faint);
+  text-anchor: middle;
+}
+.target.is-hit .target__flag { fill: var(--color-accent); }
+
+/* ---------------------------- 读数 ------------------------------------ */
+.readout {
+  display: grid;
+  gap: var(--space-1);
+  text-align: center;
+}
+.readout__name {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
+}
+.readout__meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: var(--color-muted);
+}
+
+/* ============================ 控制条 ================================== */
+.console {
+  display: grid;
+  grid-template-areas:
+    "task actions lesson"
+    "task feedback lesson";
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.15fr) minmax(0, 1fr);
+  column-gap: var(--space-5);
+  row-gap: var(--space-3);
+  align-items: start;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.task { grid-area: task; display: grid; gap: var(--space-2); }
+.actions { grid-area: actions; display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.feedback { grid-area: feedback; }
+.lesson { grid-area: lesson; }
+
+.task__target {
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 4.2vw, 2.9rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  line-height: 1.05;
+  color: var(--color-accent);
+}
+.task__hint {
+  font-size: var(--fs-sm);
+  line-height: 1.8;
+  color: var(--color-faint);
+}
+
+.feedback {
+  min-height: 3.2em;
+  font-size: var(--fs-sm);
+  line-height: 1.75;
+  color: var(--color-text-soft);
+}
+.feedback b {
+  font-weight: 400;
+  color: var(--color-accent);
+}
+.feedback .grade {
+  display: inline-block;
+  margin-right: var(--space-2);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border-accent);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  color: var(--color-accent);
+}
+.feedback[data-tone="good"] .grade {
+  border-color: rgba(151, 196, 89, 0.5);
+  color: #a8d167;
+}
+.feedback[data-tone="bad"] .grade {
+  border-color: rgba(224, 122, 95, 0.42);
+  color: #e07a5f;
+}
+
+.lesson {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: rgba(19, 26, 44, 0.5);
+}
+.lesson__k {
+  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.18em;
+  color: var(--color-faint);
+}
+.lesson__v {
+  font-size: var(--fs-sm);
+  line-height: 1.8;
+  color: var(--color-text-soft);
+}
+.lesson__v code,
+.game-foot code {
+  padding: 1px 5px;
+  border-radius: var(--radius-sm);
+  background: rgba(195, 202, 219, 0.08);
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--color-accent);
+}
+
+/* ============================ 页脚 ==================================== */
+.game-foot {
+  position: relative;
+  z-index: var(--z-content);
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-5) var(--page-pad) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  display: grid;
+  gap: var(--space-2);
+}
+.game-foot p {
+  max-width: 52em;
+  font-size: var(--fs-sm);
+  color: var(--color-faint);
+  line-height: 1.95;
+}
+.game-foot a {
+  color: var(--color-muted);
+  transition: color var(--dur-fast) ease-out;
+}
+.game-foot a:hover { color: var(--color-accent); }
+
+/* ============================ 响应式 ================================== */
+@media (max-width: 900px) {
+  .game { padding-top: var(--space-4); }
+
+  .console {
+    grid-template-areas:
+      "task"
+      "actions"
+      "feedback"
+      "lesson";
+    grid-template-columns: 1fr;
+    row-gap: var(--space-4);
+  }
+  .feedback { min-height: 0; }
+  .game-bar { flex-wrap: wrap; row-gap: var(--space-2); }
+  .lvnav { margin-left: 0; width: 100%; }
+}
+
+@media (max-width: 640px) {
+  .game-bar__back { font-size: var(--fs-base); }
+  .game-bar .eyebrow { display: none; }
+  .lvnav__btn { padding: 0 10px; }
+  .task__target { font-size: clamp(1.6rem, 8vw, 2.2rem); }
+  .mark__label { font-size: 11px; }
+}

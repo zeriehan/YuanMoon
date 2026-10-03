@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>光路挑战 · 缘梦 YuanMoon</title>
+<meta name="description" content="拖动镜子和玻璃砖，让一束光走到该去的地方。反射、折射、全反射，三个关卡。">
+<meta name="theme-color" content="#04060d">
+<meta name="color-scheme" content="dark">
+
+<link rel="canonical" href="https://yuanmoon.me/games/light-path/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="缘梦 YuanMoon">
+<meta property="og:title" content="光路挑战 · 缘梦 YuanMoon">
+<meta property="og:description" content="拖动镜子和玻璃砖，让一束光走到该去的地方。">
+<meta property="og:url" content="https://yuanmoon.me/games/light-path/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://yuanmoon.me/assets/img/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../styles/tokens.css">
+<link rel="stylesheet" href="../../styles/base.css">
+<link rel="stylesheet" href="../../styles/components.css">
+<link rel="stylesheet" href="game.css">
+
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<a class="skip-link" href="#play">跳到游戏</a>
+
+<div class="starfield" aria-hidden="true">
+  <div class="starfield__glow"></div>
+  <svg class="starfield__svg" id="starfield" preserveAspectRatio="none"></svg>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="game-bar">
+  <a class="game-bar__back" href="../../index.html">
+    <span aria-hidden="true">←</span> 缘梦
+  </a>
+  <p class="eyebrow">小游戏 02 · 几何光学</p>
+  <nav class="lvnav" aria-label="选关">
+    <button class="lvnav__btn is-on" data-level="0" type="button">1 反射</button>
+    <button class="lvnav__btn" data-level="1" type="button">2 折射</button>
+    <button class="lvnav__btn" data-level="2" type="button">3 全反射</button>
+    <button class="lvnav__btn" data-level="3" type="button">自由搭建</button>
+  </nav>
+</header>
+
+<main class="game game--wide" id="play">
+
+  <!-- ==================== 光学台 ==================== -->
+  <div class="bench">
+    <svg class="bench__svg" id="bench" viewBox="0 0 880 520" role="img"
+         aria-labelledby="benchTitle benchDesc">
+      <title id="benchTitle">光学台</title>
+      <desc id="benchDesc">一束光从光源射出，经镜面反射与玻璃折射后抵达靶点。可以拖动元件改变角度。</desc>
+
+      <defs>
+        <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#fffdf7" stop-opacity="0.95"/>
+          <stop offset="100%" stop-color="#f2c879" stop-opacity="0.75"/>
+        </linearGradient>
+        <radialGradient id="lampGrad" cx="38%" cy="32%" r="70%">
+          <stop offset="0%" stop-color="#fffdf7"/>
+          <stop offset="100%" stop-color="#e8c98a"/>
+        </radialGradient>
+      </defs>
+
+      <g id="gridLayer" aria-hidden="true"></g>
+      <g id="partLayer"></g>
+      <g id="beamLayer"></g>
+      <g id="markLayer"></g>
+      <g id="targetLayer"></g>
+      <g id="handleLayer"></g>
+    </svg>
+
+    <p class="readout" aria-live="polite">
+      <span class="readout__name" id="readoutName">把光引到靶心</span>
+      <span class="readout__meta" id="readoutMeta">拖动元件上的圆环改变角度，拖本体可以移动</span>
+    </p>
+  </div>
+
+  <!-- ==================== 控制台 ==================== -->
+  <div class="console">
+
+    <div class="task">
+      <p class="eyebrow" id="levelTag">第 1 关 / 共 3 关</p>
+      <h1 class="task__target" id="taskName">反射</h1>
+      <p class="task__hint" id="taskHint">拖动镜面上的圆环，直到光落在靶心上。</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn--primary" id="resetBtn" type="button">重置这一关</button>
+      <button class="btn btn--ghost" id="solveBtn" type="button">给个提示</button>
+    </div>
+
+    <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+
+    <div class="lesson" id="lesson">
+      <p class="lesson__k">本关要点</p>
+      <p class="lesson__v" id="lessonText">入射角等于反射角。镜面转 θ，反射光就转 2θ。</p>
+    </div>
+
+  </div>
+</main>
+
+<footer class="game-foot">
+  <p>
+    折射定律由斯涅尔给出：<code>n₁ sin θ₁ = n₂ sin θ₂</code>。光从水射向空气时，
+    入射角超过临界角 <code id="critAngle">48.8°</code> 就不会再射出来，而是全部弹回 —— 这就是全反射。
+  </p>
+  <p><a href="../../index.html">← 回缘梦</a></p>
+</footer>
+
+<script src="../../scripts/main.js" defer></script>
+<script src="light.js" defer></script>
+</body>
+</html>
