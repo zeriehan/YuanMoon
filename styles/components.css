@@ -893,6 +893,130 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------------------------- 灯箱 ------------------------------------
+   图集点开看大图。结构先立起来 —— 现在还没有真图，格子会走「占位」分支，
+   显示这个位置将来放什么；填上 data-full 之后同一套代码直接显示图片。 */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-header);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: center;
+  justify-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+.lightbox[hidden] { display: none; }
+
+.lightbox__scrim {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--ink-950) 88%, transparent);
+  border: 0;
+  cursor: zoom-out;
+}
+.lightbox__stage {
+  position: relative;
+  grid-column: 2;
+  grid-row: 1;
+  display: grid;
+  gap: var(--space-3);
+  justify-items: center;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+}
+/* 真实图片：留出 4:3 的框，加载完也不会跳版 */
+.lightbox__img {
+  display: block;
+  max-width: min(84vw, 1000px);
+  max-height: 74vh;
+  width: auto;
+  height: auto;
+  border: 1px solid var(--color-border-accent);
+  border-radius: var(--radius-md);
+  background: var(--ink-900);
+}
+.lightbox__img[hidden] { display: none; }
+
+/* 占位分支：没有 data-full 时显示这个，不假装有图 */
+.lightbox__ph {
+  display: grid;
+  place-items: center;
+  gap: var(--space-2);
+  width: min(84vw, 760px);
+  aspect-ratio: 4 / 3;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(110% 110% at 30% 20%,
+      color-mix(in srgb, var(--moon-300) 8%, transparent), transparent 70%),
+    var(--ink-900);
+  text-align: center;
+  padding: var(--space-5);
+}
+.lightbox__ph-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  color: var(--color-text-soft);
+}
+.lightbox__ph-note {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.1em;
+  line-height: 1.9;
+  color: var(--color-faint);
+}
+.lightbox__ph[hidden] { display: none; }
+
+.lightbox__cap {
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+  text-align: center;
+}
+.lightbox__cap:empty { display: none; }
+
+.lightbox__close,
+.lightbox__nav {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink-900) 72%, transparent);
+  font-family: var(--font-sans);
+  font-size: var(--fs-md);
+  color: var(--color-text-soft);
+  cursor: pointer;
+  transition: color var(--dur-fast) ease-out,
+              border-color var(--dur-fast) ease-out;
+}
+.lightbox__close:hover,
+.lightbox__nav:hover {
+  color: var(--color-accent);
+  border-color: var(--color-border-accent);
+}
+.lightbox__close { grid-column: 3; grid-row: 1; font-size: var(--fs-lg); }
+.lightbox__nav--prev { grid-column: 1; grid-row: 1; }
+.lightbox__nav--next { grid-column: 3; grid-row: 1; }
+.lightbox__close + .lightbox__nav--next { grid-column: 1; grid-row: 1; }
+
+/* 计数放第二行居中 */
+.lightbox__count {
+  grid-column: 2;
+  grid-row: 2;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.16em;
+  color: var(--color-faint);
+}
+/* 只有一张图时不显示左右箭头 */
+.lightbox[data-single="true"] .lightbox__nav { display: none; }
+
 @media (max-width: 900px) {
   .works { grid-template-columns: 1fr; }
   .work:nth-child(n) { margin-top: 0; }
