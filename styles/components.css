@@ -570,10 +570,11 @@
               box-shadow var(--dur-base) ease-out;
 }
 
-/* 卡片倒错：不在一条水平线上。2×2 下按 左上→右上→左下→右下 走 */
-.work:nth-child(2) { margin-top: var(--space-6); }
-.work:nth-child(3) { margin-top: var(--space-2); }
-.work:nth-child(4) { margin-top: var(--space-5); }
+/* 卡片倒错：2 列网格里，左列和右列各自往下错一点，
+   幅度刻意压小（16 / 24 / 40px）—— 大偏移会让三张卡读起来像缺了一张。
+.work:nth-child(2) { margin-top: var(--space-5); }
+.work:nth-child(3) { margin-top: var(--space-3); }
+.work:nth-child(4) { margin-top: var(--space-4); }
 
 .work:hover {
   border-color: var(--color-border-accent);

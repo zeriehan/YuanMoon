@@ -109,15 +109,15 @@
     byKey(cfg.footnote, "footnote");
   }
 
-  /* ---- 作品卡片 ----------------------------------------------------- */
+  /* ---- 游戏卡片 ----------------------------------------------------- */
 
   /* 卡片是配置驱动的：works 里有几项就渲染几张。
      index.html 里原本那几张作为无 JS 兜底保留，JS 接管后被替换掉。 */
-  if (Array.isArray(cfg.works) && cfg.works.length) {
-    var wrap = document.querySelector("[data-works]");
+  if (Array.isArray(cfg.games) && cfg.games.length) {
+    var wrap = document.querySelector("[data-games]");
     if (wrap) {
       wrap.textContent = "";
-      cfg.works.forEach(function (w) {
+      cfg.games.forEach(function (w) {
         wrap.appendChild(buildCard(w));
       });
     }
