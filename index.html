@@ -68,6 +68,7 @@
 
   <nav class="site-nav" aria-label="主导航">
     <a class="site-nav__link" href="#origin">缘起</a>
+    <a class="site-nav__link" href="#games">游戏</a>
     <a class="site-nav__link" href="#works">作品</a>
     <a class="site-nav__link" href="#about">关于</a>
   </nav>
@@ -134,7 +135,7 @@
       </ul>
 
       <div class="hero__actions">
-        <a class="btn btn--primary" href="#works">看作品</a>
+        <a class="btn btn--primary" href="#games">看游戏</a>
         <a class="btn btn--ghost" href="#origin">名字的由来</a>
       </div>
     </div>
@@ -193,10 +194,10 @@
   </section>
 
   <!-- ==================== 作品 ==================== -->
-  <section class="section reveal" id="works" aria-labelledby="worksTitle">
+  <section class="section reveal" id="games" aria-labelledby="gamesTitle">
     <div class="section__head">
-      <p class="eyebrow">02 / 作品</p>
-      <h2 id="worksTitle">正在建造的东西</h2>
+      <p class="eyebrow">02 / 游戏</p>
+      <h2 id="gamesTitle">正在建造的东西</h2>
       <p class="hero__lede" style="font-size:var(--fs-base);color:var(--color-muted)">
         每张卡片的图标是一枚月相。它现在是什么形状，进度就是什么样 ——
         刚冒头的还是细月牙，能玩的已经转成盈凸月，做完的会转成满月。
@@ -283,10 +284,83 @@
     </div>
   </section>
 
+  <!-- ==================== 作品 ==================== -->
+  <section class="section reveal" id="works" aria-labelledby="worksTitle">
+    <div class="section__head">
+      <p class="eyebrow">03 / 作品</p>
+      <h2 id="worksTitle">做过的东西</h2>
+      <p class="hero__lede" style="font-size:var(--fs-base);color:var(--color-muted)">
+        这一栏和上面那栏不一样：游戏是可以玩的，作品是要看的 ——
+        所以图排成网格，片子占一整块，文字给出书名和它有多长。
+        形态跟着媒介走，不硬塞进同一张卡里。
+      </p>
+    </div>
+
+    <div class="projects" data-projects>
+
+      <!-- 工具类：能带走的东西。宽卡，带一个明确的动作 -->
+      <article class="tool">
+        <div class="tool__body">
+          <p class="tool__kind">模板</p>
+          <h3 class="tool__title">站点模板</h3>
+          <p class="tool__desc">
+            就是这个站本身。纯手写 HTML / CSS / JS，无框架无构建、无 npm，
+            改一个配置文件就能换成你自己的站。字体已经自托管在仓库里，clone 下来直接用。
+          </p>
+          <p class="tool__meta">HTML · CSS · JS · 约 0.4 MB</p>
+        </div>
+        <div class="tool__aside">
+          <span class="work__status work__status--soon">即将公开</span>
+        </div>
+      </article>
+
+      <!-- 图集类：3D 渲染、平面设计 -->
+      <article class="shot">
+        <div class="shot__head">
+          <h3 class="shot__title">3D 与平面</h3>
+          <span class="shot__kind">图像</span>
+        </div>
+        <div class="shot__grid" aria-hidden="true">
+          <div class="shot__cell"><span>渲染练习</span></div>
+          <div class="shot__cell"><span>字体排印</span></div>
+          <div class="shot__cell"><span>版面构成</span></div>
+          <div class="shot__cell"><span>配色实验</span></div>
+        </div>
+        <p class="shot__note">都是练习。攒够一批，再挑几张放上来。</p>
+      </article>
+
+      <!-- 视频类：剪辑 -->
+      <article class="film">
+        <div class="film__frame" aria-hidden="true">
+          <span class="film__play"></span>
+          <span class="film__len">00:00</span>
+        </div>
+        <div class="film__body">
+          <h3 class="film__title">短片</h3>
+          <p class="film__desc">
+            剪辑练手。念头、分镜、节奏，都是自己的活儿。
+          </p>
+        </div>
+      </article>
+
+      <!-- 文字类：小说、随笔 -->
+      <article class="writ">
+        <p class="writ__kind">文字</p>
+        <h3 class="writ__title">正在写的那本</h3>
+        <p class="writ__desc">
+          小说是我一直想试的一件事。写的时候才发现，前二十页最难的不是想情节，
+          是想清楚这个人到底想要什么。
+        </p>
+        <p class="writ__meta"><b>0</b> 字 · 大约 <b>0</b> 分钟读完</p>
+      </article>
+
+    </div>
+  </section>
+
   <!-- ==================== 关于 ==================== -->
   <section class="section reveal" id="about" aria-labelledby="aboutTitle">
     <div class="section__head">
-      <p class="eyebrow">03 / 关于</p>
+      <p class="eyebrow">04 / 关于</p>
       <h2 id="aboutTitle">一个人，一台电脑</h2>
     </div>
 
