@@ -904,6 +904,123 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* 章节编号用 CSS counter，不用硬编码 ——
+   分面之后「01 缘起 / 02 游戏 / 03 作品 / 04 关于」在亮面会显示成 02、03，
+   在暗面显示成 01、04，两边都跳号。counter 只给**生成盒子的元素**计数，
+   而 display:none 的不生成盒子，所以每一面自然从 01 重新开始；
+   脚本不跑时没有 data-face，就按 DOM 顺序编号，同样连续。 */
+[data-face] { counter-reset: faceSec; }
+.eyebrow--num { counter-increment: faceSec; }
+.eyebrow--num::before {
+  content: counter(faceSec, decimal-leading-zero) " / ";
+}
+
+/* ======================================================================
+   8. 亮面 / 暗面
+   ----------------------------------------------------------------------
+   底色不跟着翻 —— 底色一直是深空，变的只是月亮走到哪儿。
+   隐藏规则挂在 [data-face] 上，而这个属性只由 scripts/face.js 写：
+   脚本不跑 → 没有属性 → 两条规则都不生效 → 两面都显示，页面完整可读。
+   ====================================================================== */
+[data-face="lit"] [data-face="dark"],
+[data-face="dark"] [data-face="lit"] { display: none; }
+
+/* 导航里的分组同理 */
+[data-face="lit"] .site-nav__group[data-face="dark"],
+[data-face="dark"] .site-nav__group[data-face="lit"] { display: none; }
+
+/* ---------------------------- 切换键 ---------------------------------- */
+.facetoggle {
+  position: relative;
+  z-index: var(--z-content);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-2) 0 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-faint);
+  transition: color var(--dur-fast) ease-out;
+}
+.facetoggle:hover { color: var(--color-accent); }
+.facetoggle__svg {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 50%;
+  transition: transform var(--dur-slow) var(--ease-out);
+}
+.facetoggle:hover .facetoggle__svg { transform: rotate(-18deg); }
+
+/* 暗面时给月亮留一圈极弱的反照，不然空盘子在深空底上完全看不见 */
+.facetoggle.is-dark .facetoggle__dark { fill: #131a2c; }
+.facetoggle__face {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.16em;
+  white-space: nowrap;
+}
+
+/* ---------------------------- 换面覆盖层 ------------------------------
+   一轮月亮从满月走到新月。走到一半时内容换面 ——
+   那时月亮正好在中间，两面都看不清，所以切换藏在中间。 */
+.faceturn {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  opacity: 0;
+  background: color-mix(in srgb, var(--ink-950) 82%, transparent);
+  transition: opacity 180ms ease-out;
+}
+.faceturn[hidden] { display: none; }
+.faceturn.is-on { opacity: 1; }
+.faceturn__svg {
+  width: min(78vmin, 78vh);
+  height: min(78vmin, 78vh);
+  overflow: visible;
+}
+.faceturn__dark { fill: #0a0e1a; }
+
+/* ---------------------------- 联系栏 ---------------------------------- */
+.contact {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+  max-width: 40em;
+}
+.contact__item {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, var(--color-surface), var(--ink-850));
+  transition: border-color var(--dur-base) ease-out;
+}
+.contact__item:hover { border-color: var(--color-border-accent); }
+.contact__kind {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.2em;
+  color: var(--color-faint);
+}
+.contact__value {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  color: var(--color-accent);
+}
+.contact__hint {
+  font-size: var(--fs-sm);
+  line-height: 1.9;
+  color: var(--color-faint);
+}
+
 /* ---------------------------- 灯箱 ------------------------------------
    图集点开看大图。结构先立起来 —— 现在还没有真图，格子会走「占位」分支，
    显示这个位置将来放什么；填上 data-full 之后同一套代码直接显示图片。 */
