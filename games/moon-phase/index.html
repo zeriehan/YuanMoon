@@ -56,9 +56,9 @@
         <desc id="moonDesc">可以调节的月亮</desc>
         <defs>
           <radialGradient id="moonHaloGradient">
-            <stop offset="58%" stop-color="#f2c879" stop-opacity="0"/>
-            <stop offset="78%" stop-color="#f2c879" stop-opacity="0.32"/>
-            <stop offset="100%" stop-color="#f2c879" stop-opacity="0"/>
+            <stop offset="58%" stop-color="var(--halo-300)" stop-opacity="0"/>
+            <stop offset="78%" stop-color="var(--halo-300)" stop-opacity="0.32"/>
+            <stop offset="100%" stop-color="var(--halo-300)" stop-opacity="0"/>
           </radialGradient>
           <radialGradient id="moonLit" cx="36%" cy="32%" r="76%">
             <stop offset="0%" stop-color="#fffdf7"/>
@@ -75,7 +75,7 @@
         <circle class="moon__halo" id="moonHalo" cx="200" cy="200" r="198" fill="url(#moonHaloGradient)"/>
         <circle class="moon__earthshine" cx="200" cy="200" r="140" fill="url(#moonDark)"/>
         <path class="moon__lit" id="moonLitPath" d=""/>
-        <circle cx="200" cy="200" r="140" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+        <circle cx="200" cy="200" r="140" fill="none" stroke="var(--halo-300)" stroke-width="1" opacity="0.45"/>
         <!-- 自转刻度：让月亮的方位可读，也给画面一点仪器的感觉 -->
         <circle cx="200" cy="200" r="176" fill="none" stroke="rgba(195,202,219,.14)"
                 stroke-width="1" stroke-dasharray="1 14"/>

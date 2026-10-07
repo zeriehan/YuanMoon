@@ -71,7 +71,7 @@ body {
 .lvnav__btn.is-on {
   color: var(--color-accent);
   border-color: var(--color-border-accent);
-  background: rgba(242, 200, 121, 0.08);
+  background: color-mix(in srgb, var(--halo-300) 8%, transparent);
 }
 .lvnav__btn.is-clear {
   color: var(--color-text-soft);
@@ -201,7 +201,7 @@ body {
 }
 .handle__ring {
   fill: none;
-  stroke: rgba(242, 200, 121, 0.22);
+  stroke: color-mix(in srgb, var(--halo-300) 22%, transparent);
   stroke-width: 1;
   stroke-dasharray: 2 6;
 }
@@ -213,16 +213,16 @@ body {
   stroke-width: 3;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: drop-shadow(0 0 5px rgba(242, 200, 121, 0.35));
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--halo-300) 35%, transparent));
 }
 /* 在介质里走的那几段压暗一点 —— 一眼看出光"进了水/玻璃" */
 .beam--in {
-  stroke: rgba(242, 200, 121, 0.45);
+  stroke: color-mix(in srgb, var(--halo-300) 45%, transparent);
   stroke-dasharray: 7 5;
 }
 .beam-dot {
   fill: #fffdf7;
-  filter: drop-shadow(0 0 6px rgba(242, 200, 121, 0.7));
+  filter: drop-shadow(0 0 6px color-mix(in srgb, var(--halo-300) 70%, transparent));
 }
 
 /* 事件标记：全反射是这一关的主角，标出来 */

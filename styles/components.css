@@ -26,7 +26,7 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(58rem 42rem at 82% 22%, rgba(242, 200, 121, 0.09), transparent 62%),
+    radial-gradient(58rem 42rem at 82% 22%, color-mix(in srgb, var(--halo-300) 9%, transparent), transparent 62%),
     radial-gradient(48rem 40rem at 8% 78%, rgba(94, 116, 190, 0.11), transparent 60%);
 }
 
@@ -386,7 +386,7 @@
 .btn--ghost:hover {
   border-color: var(--color-border-accent);
   color: var(--color-text);
-  background: rgba(242, 200, 121, 0.06);
+  background: color-mix(in srgb, var(--halo-300) 6%, transparent);
 }
 
 /* 禁用态：整个站点的按钮都可能有这一态 */
@@ -519,7 +519,7 @@
 }
 .gloss__item:hover .gloss__glyph {
   -webkit-text-stroke-color: var(--color-accent);
-  color: rgba(242, 200, 121, 0.06);
+  color: color-mix(in srgb, var(--halo-300) 6%, transparent);
 }
 
 .gloss__item h3 {
@@ -590,7 +590,7 @@
   width: 70%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(242, 200, 121, 0.16), transparent 68%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--halo-300) 16%, transparent), transparent 68%);
   opacity: 0;
   transition: opacity var(--dur-slow) var(--ease-out);
   pointer-events: none;

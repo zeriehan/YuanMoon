@@ -94,7 +94,7 @@ body {
   position: absolute;
   inset: -12%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(242, 200, 121, 0.13), transparent 66%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--halo-300) 13%, transparent), transparent 66%);
   opacity: var(--stage-glow, 0.2);
   transition: opacity var(--dur-base) linear;
   pointer-events: none;
@@ -193,7 +193,7 @@ kbd {
   border-radius: 2px;
   background: linear-gradient(90deg,
     rgba(195, 202, 219, 0.10),
-    rgba(242, 200, 121, 0.45),
+    color-mix(in srgb, var(--halo-300) 45%, transparent),
     rgba(195, 202, 219, 0.10));
 }
 .slider::-webkit-slider-thumb {
@@ -205,7 +205,7 @@ kbd {
   border-radius: 50%;
   background: var(--color-accent);
   border: 2px solid var(--ink-950);
-  box-shadow: 0 0 14px rgba(242, 200, 121, 0.55);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--halo-300) 55%, transparent);
   transition: transform var(--dur-fast) ease-out;
 }
 .slider:hover::-webkit-slider-thumb {
@@ -216,7 +216,7 @@ kbd {
   border-radius: 2px;
   background: linear-gradient(90deg,
     rgba(195, 202, 219, 0.10),
-    rgba(242, 200, 121, 0.45),
+    color-mix(in srgb, var(--halo-300) 45%, transparent),
     rgba(195, 202, 219, 0.10));
 }
 .slider::-moz-range-thumb {
@@ -230,7 +230,7 @@ kbd {
   outline: none;
 }
 .slider:focus-visible::-webkit-slider-thumb {
-  box-shadow: 0 0 0 4px rgba(242, 200, 121, 0.32), 0 0 14px rgba(242, 200, 121, 0.55);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--halo-300) 32%, transparent), 0 0 14px color-mix(in srgb, var(--halo-300) 55%, transparent);
 }
 .slider:disabled {
   opacity: 0.4;

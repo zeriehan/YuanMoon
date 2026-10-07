@@ -35,6 +35,10 @@
 <link rel="stylesheet" href="styles/base.css">
 <link rel="stylesheet" href="styles/components.css">
 
+<!-- 站点配置。同步加载（不加 defer），保证后面的 apply 脚本能读到它。
+     没有这个文件也能正常工作 —— 页面会退回 HTML 里写好的内容。 -->
+<script src="site.config.js"></script>
+
 <!-- 标记"脚本可用"。滚动入场效果依赖它：万一 JS 挂了或用户禁用脚本，
      页面依然完整可读，而不是留下一片永远不出现的空白。 -->
 <script>document.documentElement.classList.add("js");</script>
@@ -53,13 +57,13 @@
 <header class="site-header" data-scrolled="false" id="siteHeader">
   <a class="brand" href="#top" aria-label="缘梦 YuanMoon 首页">
     <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="15" fill="none" stroke="#f2c879" stroke-width="1.2" opacity="0.55"/>
-      <path d="M20 5 A15 15 0 0 1 20 35 A9 15 0 0 1 20 5 Z" fill="#fbeccc"/>
+      <circle cx="20" cy="20" r="15" fill="none" stroke="var(--halo-300)" stroke-width="1.2" opacity="0.55"/>
+      <path d="M20 5 A15 15 0 0 1 20 35 A9 15 0 0 1 20 5 Z" fill="var(--halo-100)"/>
     </svg>
-    <span class="brand__text">
-      <span class="brand__cn">缘梦</span>
-      <span class="brand__en">YuanMoon</span>
-    </span>
+      <span class="brand__text">
+        <span class="brand__cn" data-site="name">缘梦</span>
+        <span class="brand__en" data-site="nameEn">YuanMoon</span>
+      </span>
   </a>
 
   <nav class="site-nav" aria-label="主导航">
@@ -80,9 +84,9 @@
         <defs>
           <!-- 月晕：月亮外圈那层柔光 -->
           <radialGradient id="moonHaloGradient">
-            <stop offset="62%" stop-color="#f2c879" stop-opacity="0"/>
-            <stop offset="80%" stop-color="#f2c879" stop-opacity="0.30"/>
-            <stop offset="100%" stop-color="#f2c879" stop-opacity="0"/>
+            <stop offset="62%" stop-color="var(--halo-300)" stop-opacity="0"/>
+            <stop offset="80%" stop-color="var(--halo-300)" stop-opacity="0.30"/>
+            <stop offset="100%" stop-color="var(--halo-300)" stop-opacity="0"/>
           </radialGradient>
           <!-- 亮面：左上方受光，右下方转为暖金，模拟满月的实感 -->
           <radialGradient id="moonLit" cx="36%" cy="32%" r="76%">
@@ -105,7 +109,7 @@
         <!-- 亮面：由脚本按相位重算路径 -->
         <path class="moon__lit" id="moonLitPath" d=""/>
         <!-- 月盘外缘：一条金线，让新月时也看得出这是一轮月 -->
-        <circle cx="200" cy="200" r="140" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+        <circle cx="200" cy="200" r="140" fill="none" stroke="var(--halo-300)" stroke-width="1" opacity="0.45"/>
       </svg>
       <p class="hero__moon-caption">月相 <b id="moonPhaseLabel">00</b>%</p>
     </div>
@@ -114,11 +118,11 @@
       <p class="eyebrow">YuanMoon · 缘梦</p>
 
       <h1 class="hero__title" id="heroTitle">
-        <span class="hero__title-cn">缘梦</span>
-        <span class="hero__title-en" lang="en">YuanMoon</span>
+        <span class="hero__title-cn" data-site="name">缘梦</span>
+        <span class="hero__title-en" lang="en" data-site="nameEn">YuanMoon</span>
       </h1>
 
-      <p class="hero__lede">
+      <p class="hero__lede" data-site="lede">
         这里放我自己做的小游戏、正在啃的时空与相对论，
         还有一些还不知道会长成什么样的念头。
       </p>
@@ -199,14 +203,17 @@
       </p>
     </div>
 
-    <div class="works">
+    <!-- 卡片由 site.config.js 的 works 数组渲染（每张卡的月相图标 = 那个 phase）。
+         下面这四张是**禁用 JS 时**的兜底，内容与 site.config.js 保持一致。 -->
+    <div class="works" data-works>
+
       <article class="work work--live">
         <div class="work__head">
-          <!-- 月相即进度：这张已经转到盈凸月（约 85%），对应"可玩，还在加" -->
+          <!-- phase 0.85：k = cos(2π×0.425) = −0.891，亮面 85% -->
           <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
             <circle cx="20" cy="20" r="14" fill="#131a2c"/>
-            <path d="M20 6 A14 14 0 0 1 20 34 A9.9 14 0 0 1 20 6 Z" fill="#f7ecd4"/>
-            <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+            <path d="M20 6 A14 14 0 0 1 20 34 A9.80 14 0 0 1 20 6 Z" fill="var(--halo-100)"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="var(--halo-300)" stroke-width="1" opacity="0.45"/>
           </svg>
           <span class="work__tag">小游戏 01</span>
         </div>
@@ -221,11 +228,11 @@
 
       <article class="work work--live">
         <div class="work__head">
-          <!-- 约 55% 的月牙：比左卡亮一截，对应"也在做了" -->
+          <!-- phase 0.55：k = cos(2π×0.275) = −0.156，刚过右半圈 -->
           <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
             <circle cx="20" cy="20" r="14" fill="#131a2c"/>
-            <path d="M20 6 A14 14 0 0 1 20 34 A7.5 14 0 0 0 20 6 Z" fill="#f7ecd4"/>
-            <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+            <path d="M20 6 A14 14 0 0 1 20 34 A1.40 14 0 0 1 20 6 Z" fill="var(--halo-100)"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="var(--halo-300)" stroke-width="1" opacity="0.45"/>
           </svg>
           <span class="work__tag">小游戏 02</span>
         </div>
@@ -240,11 +247,29 @@
 
       <article class="work">
         <div class="work__head">
-          <!-- 约 12% 的细月牙，对应"构思中"；比左卡细、比右卡有内容 -->
+          <!-- phase 0.90：k = cos(2π×0.45) = −0.951，快满了但还没满 -->
           <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
             <circle cx="20" cy="20" r="14" fill="#131a2c"/>
-            <path d="M20 6 A14 14 0 0 1 20 34 A10.2 14 0 0 0 20 6 Z" fill="#c3cadb"/>
-            <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
+            <path d="M20 6 A14 14 0 0 1 20 34 A11.20 14 0 0 1 20 6 Z" fill="var(--halo-100)"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="var(--halo-300)" stroke-width="1" opacity="0.45"/>
+          </svg>
+          <span class="work__tag">模板</span>
+        </div>
+        <h3 class="work__title">站点模板</h3>
+        <p class="work__desc">
+          这个站本身就是模板。纯手写 HTML / CSS / JS，无框架无构建，
+          改一个配置文件就能换成你自己的 —— 不用会写代码。
+        </p>
+        <span class="work__status work__status--soon">即将公开</span>
+      </article>
+
+      <article class="work">
+        <div class="work__head">
+          <!-- phase 0.21：k = cos(2π×0.105) = 0.790，还是一弯细月牙 -->
+          <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
+            <circle cx="20" cy="20" r="14" fill="#131a2c"/>
+            <path d="M20 6 A14 14 0 0 1 20 34 A8.12 14 0 0 0 20 6 Z" fill="var(--halo-100)"/>
+            <circle cx="20" cy="20" r="14" fill="none" stroke="var(--halo-300)" stroke-width="1" opacity="0.45"/>
           </svg>
           <span class="work__tag">大游戏 · 时空</span>
         </div>
@@ -254,22 +279,6 @@
           时间会怎样被拉长，空间又会怎样被压扁 —— 我想让你亲手转一下这个旋钮。
         </p>
         <span class="work__status work__status--soon">构思中</span>
-      </article>
-
-      <article class="work">
-        <div class="work__head">
-          <!-- 新月：还没亮起来，对应"待定" -->
-          <svg class="work__phase" viewBox="0 0 40 40" aria-hidden="true">
-            <circle cx="20" cy="20" r="14" fill="#131a2c"/>
-            <circle cx="20" cy="20" r="14" fill="none" stroke="#f2c879" stroke-width="1" opacity="0.45"/>
-          </svg>
-          <span class="work__tag">小程序 · 试验</span>
-        </div>
-        <h3 class="work__title">随手能用的小工具</h3>
-        <p class="work__desc">
-          微信里就能用的小东西。目前还是一张白纸，等哪个念头先长成形。
-        </p>
-        <span class="work__status">待定</span>
       </article>
     </div>
   </section>
@@ -301,7 +310,7 @@
       <dl class="about__facts">
         <div>
           <dt>名字</dt>
-          <dd>缘梦 · YuanMoon</dd>
+          <dd><span data-site="name">缘梦</span> · <span data-site="nameEn">YuanMoon</span></dd>
         </div>
         <div>
           <dt>记号</dt>
@@ -312,8 +321,8 @@
           <dd>纯手写 HTML / CSS / JS，无框架无构建</dd>
         </div>
         <div>
-          <dt>安置</dt>
-          <dd>Cloudflare Pages · 静态托管</dd>
+          <dt>改造</dt>
+          <dd>改 <code>site.config.js</code> 一个文件就能换成自己的站</dd>
         </div>
         <div>
           <dt>更新</dt>
@@ -328,17 +337,18 @@
 <footer class="site-footer">
   <span class="site-footer__brand">
     <svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true">
-      <circle cx="20" cy="20" r="15" fill="none" stroke="#f2c879" stroke-width="1.2" opacity="0.55"/>
-      <path d="M20 5 A15 15 0 0 1 20 35 A9 15 0 0 1 20 5 Z" fill="#fbeccc"/>
+      <circle cx="20" cy="20" r="15" fill="none" stroke="var(--halo-300)" stroke-width="1.2" opacity="0.55"/>
+      <path d="M20 5 A15 15 0 0 1 20 35 A9 15 0 0 1 20 5 Z" fill="var(--halo-100)"/>
     </svg>
     缘梦
   </span>
   <p class="site-footer__meta">
-    © 2026 YuanMoon<br>
-    以月亮为记
+    © 2026 <span data-site="name">缘梦</span><br>
+    <span data-site="footnote">以月亮为记</span>
   </p>
 </footer>
 
 <script src="scripts/main.js" defer></script>
+<script src="site.apply.js" defer></script>
 </body>
 </html>

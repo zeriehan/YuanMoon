@@ -150,6 +150,20 @@ p {
   color: var(--ink-950);
 }
 
+/* ============================== 行内代码 ================================
+   正文里提到文件名、命令这类东西时用 <code>。不加样式的话浏览器会
+   给它默认等宽体，在深空底上和一整套衬线正文打架。 */
+code {
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--moon-300) 12%, transparent);
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+  word-break: break-all;
+}
+
 /* ============================== 滚动条 ================================== */
 ::-webkit-scrollbar {
   width: 10px;
