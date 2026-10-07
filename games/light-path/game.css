@@ -206,6 +206,28 @@ body {
   stroke-dasharray: 2 6;
 }
 
+/* ---------------------------- 质量 ------------------------------------
+   引力透镜那关的主角。吸积盘、核心、光晕三层都是纯 CSS，
+   不引图片也不引字体。 */
+.mass__halo {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-accent) 13%, transparent);
+  stroke-width: 14;
+}
+.mass__disk {
+  fill: color-mix(in srgb, var(--ink-950) 82%, transparent);
+  stroke: var(--color-border-accent);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 7;
+}
+.mass__core {
+  fill: #05070e;
+  stroke: var(--color-accent);
+  stroke-width: 1.4;
+  opacity: 0.92;
+}
+.opt.is-on .mass__core { stroke-width: 2; }
+
 /* ---------------------------- 光路 ------------------------------------ */
 .beam {
   fill: none;

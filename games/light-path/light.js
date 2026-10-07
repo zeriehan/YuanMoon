@@ -36,6 +36,12 @@
   function r2d(r) { return r * 180 / Math.PI; }
   function dirOf(deg) { var a = d2r(deg); return v(Math.cos(a), Math.sin(a)); }
 
+  /* 2D 旋转。引力偏折要按角度转方向，用它比三角函数手算靠谱。 */
+  function rotate(d, ang) {
+    var c = Math.cos(ang), s = Math.sin(ang);
+    return v(d.x * c - d.y * s, d.x * s + d.y * c);
+  }
+
   /* ====================== 相交与反射折射 ====================== */
 
   /* 射线 P + tD 与线段 A→B 的最近正向交点参数。平行或不在范围内返回 -1。 */
@@ -155,30 +161,38 @@
 
   /* ====================== 追迹 ====================== */
 
-  /* 场景快照：把当前元件状态编译成线段集合。
+  /* 场景快照：把当前元件状态编译成线段集合 + 质量点。
      渲染、命中判定、提示扫描全都基于这一份快照，保证三者算的是同一件事。 */
   function buildScene(parts, targets) {
     var segs = [];
+    var masses = [];
     for (var i = 0; i < parts.length; i++) {
       var p = parts[i];
       if (p.kind === "mirror") {
         segs = segs.concat(mirrorSegs(p, p.angle, p.half, i));
       } else if (p.kind === "glass" || p.kind === "water") {
         segs = segs.concat(mediumSegs(p, p.angle, p.hw, p.hh, p.n, i));
+      } else if (p.kind === "mass") {
+        p.idx = i;
+        masses.push(p);
       }
     }
-    return { segs: segs, targets: targets || [] };
+    return { segs: segs, masses: masses, targets: targets || [] };
   }
 
   /* 光线射出最后一件事：画到它离开台面为止。
      早先版本直接画 4000px，结果光从台面穿出去糊在下面的控制台上。 */
-  function exitView(p, d) {
+  function exitT(p, d) {
     var t = FAR;
     if (d.x > EPS) t = Math.min(t, (VB_W - p.x) / d.x);
     if (d.x < -EPS) t = Math.min(t, (0 - p.x) / d.x);
     if (d.y > EPS) t = Math.min(t, (VB_H - p.y) / d.y);
     if (d.y < -EPS) t = Math.min(t, (0 - p.y) / d.y);
-    if (!(t > 0)) t = 0;
+    return t > 0 ? t : 0;
+  }
+
+  function exitView(p, d) {
+    var t = exitT(p, d);
     return v(p.x + d.x * t, p.y + d.y * t);
   }
 
@@ -189,9 +203,20 @@
 
     var pts = [v(p.x, p.y)];
     var segMedia = [];          // 第 i 段（pts[i]→pts[i+1]）所处的折射率
-    var marks = [];             // 折射 / 全反射的标注点
+    var marks = [];             // 折射 / 全反射 / 引力偏折的标注点
     var hit = {};               // 命中的靶心下标
     var minDist = {};           // 每个靶心到光路的最近距离
+    var absorbed = false;       // 掉进质量里了
+    /* 每个质量在**这一段光路**里只作用一次。
+       不加这个限制会出事：偏折之后垂足又落在附近，而 bestT 是 Infinity，
+       条件恒成立 → 光每走 20 像素就被掰一次，在原地抖到 MAX_DEPTH 耗尽。
+       物理上一条光线掠过质量一次就只弯一次，薄透镜近似也正是这么算的。 */
+    var used = {};
+    /* 每个质量在**这一段光路**里只作用一次。
+       不加这个限制会出事：偏折之后垂足又落在附近，而 bestT 是 Infinity，
+       条件恒成立 → 光每走 20 像素就被掰一次，在原地抖到 MAX_DEPTH 耗尽。
+       物理上一条光线掠过质量一次就只弯一次，薄透镜近似也正是这么算的。 */
+    var used = {};
 
     var i, j, t, best, bestT, k, seg, np, leaving, n1, n2, N, out, dRef;
 
@@ -210,12 +235,71 @@
         if (t > 0 && t < bestT) { bestT = t; best = { type: "target", i: j }; }
       }
 
+      /* ---- 引力：找最近的一次「掠过质量」 ----
+         弱场近似下偏折角 Δθ = 4GM / (c²b)。牛顿引力给的光偏折是
+         2GM / (c²b) —— 广义相对论正好是它的两倍，这个「两倍」是爱因斯坦
+         1919 年那次日食观测测出来的东西，也是这关的题眼。
+
+         为什么不在这里算折射率梯度（n = n(p)）：那样能做，但要切成几十层
+         薄壳逐层折射，数值上会发散、也不好验证。直接用偏折公式更短、
+         更准，而且「是牛顿的两倍」可以直接断言。 */
+      var gm = null, gmB = Infinity, gmT = 0, swallowed = null;
+      for (i = 0; i < (scene.masses || []).length; i++) {
+        var m = scene.masses[i];
+        var mdx = m.x - p.x, mdy = m.y - p.y;
+        var along = mdx * d.x + mdy * d.y;          // 质心在光线方向上的投影
+        if (along <= 0) continue;                     // 质心在身后，不算
+        /* 垂足到质心的距离 */
+        var bx = m.x - (p.x + d.x * along);
+        var by = m.y - (p.y + d.y * along);
+        var b = Math.sqrt(bx * bx + by * by);
+        /* 捕获判据用**光子球** r_s = 2GM/c²，不是视觉上的吸积盘半径。
+           这里 k 就是 4GM/c²，所以 r_s = k/2。b 小于它，光就不是被掰弯，
+           而是被直接吸进去 —— 这也顺带解决了数值问题：Δθ = k/b 在 b 趋近 r_s
+           时会发散（掠得越近弯得越狠，物理上是错的）。 */
+        if (b < m.absorb || b < m.k / 2) { swallowed = m; continue; }
+        if (b < gmB) { gmB = b; gmT = along; gm = m; }
+      }
+
       // 更新每个靶心的最近距离（无论这次命中了什么，都算一遍）
       var reach = best ? v(p.x + d.x * bestT, p.y + d.y * bestT) : exitView(p, d);
       for (j = 0; j < scene.targets.length; j++) {
         var q = scene.targets[j];
         var dd = pointSegDist(q.x, q.y, p.x, p.y, reach.x, reach.y);
         if (minDist[j] === undefined || dd < minDist[j]) minDist[j] = dd;
+      }
+
+      /* ---- 引力点比镜面/靶心更近？那就先把光推到偏折点 ----
+         必须和 bestT 比先后：否则光会先被引力掰弯、再回头去撞它本该
+         先撞上的镜子，顺序全乱。
+         还要看它是不是在出界之前 —— 偏折点已经在视口外，说明光早就飞出去了。 */
+      var tExit = exitT(p, d);
+      if (gm && gmT < bestT && gmT < tExit && !used[gm.idx]) {
+        used[gm.idx] = true;
+        var gp = v(p.x + d.x * gmT, p.y + d.y * gmT);
+        pts.push(gp);
+        segMedia.push(media);
+
+        var toC = norm(v(gm.x - gp.x, gm.y - gp.y));
+        /* 封顶：Δθ = k/b 只在 b 远大于 r_s 时成立（薄透镜近似）。
+           掠得比较近时公式会给出过于夸张的角度，压到 78° 封顶，
+           免得光被甩到一个物理上不可能的方向去。 */
+        var delta = Math.min(gm.k / gmB, 1.36);       // 1.36 rad ≈ 78°
+        /* 往质心那一侧转：toC 在 d 的哪一侧由叉积定符号 */
+        var sgn = cross(d, toC) >= 0 ? 1 : -1;
+        d = norm(rotate(d, delta * sgn));
+        marks.push({ x: gp.x, y: gp.y, text: "偏折 " + r2d(delta).toFixed(2) + "°" });
+
+        p = gp;
+        continue;
+      }
+
+      if (swallowed) {
+        // 落进质量：光被吞掉，路径停在这儿
+        pts.push(reach);
+        segMedia.push(media);
+        absorbed = true;
+        break;
       }
 
       if (!best) {
@@ -263,7 +347,8 @@
       p = np;
     }
 
-    return { pts: pts, segMedia: segMedia, marks: marks, hit: hit, minDist: minDist };
+    return { pts: pts, segMedia: segMedia, marks: marks, hit: hit,
+             minDist: minDist, absorbed: absorbed };
   }
 
   /* ====================== 关卡 ====================== */
@@ -303,6 +388,19 @@
       targets: [{ x: 560, y: 250, r: 24 }]
     },
     {
+      name: "引力透镜",
+      hint: "中间那颗不是玻璃球，是质量。光从它旁边过会被掰弯 —— 转到刚好擦着边打中靶心。",
+      lesson: "弱场近似下偏折角 Δθ = 4GM/(c²b)。牛顿引力算出来是 2GM/(c²b) —— 广义相对论" +
+              "正好是它的两倍。这个两倍是 1919 年日食观测测出来的，也是爱因斯坦那篇论文" +
+              "最硬的一条证据。b 越小弯得越狠，掉进吸积盘就被吞掉。",
+      pivot: 0,
+      parts: [
+        { kind: "emitter", x: 110, y: 130, angle: 50, label: "光源" },
+        { kind: "mass", x: 480, y: 250, angle: 0, k: 260, absorb: 66, label: "质量" }
+      ],
+      targets: [{ x: 830, y: 400, r: 30 }]
+    },
+    {
       name: "自由搭建",
       hint: "没有目标，随便拖。镜子和玻璃都能转，试试让光在两面镜子之间来回。",
       lesson: "沙盒里的每个元件都能平移和旋转。这里没有标准答案，光线会告诉你它想去哪。",
@@ -312,7 +410,8 @@
         { kind: "emitter", x: 120, y: 420, angle: -18, label: "光源" },
         { kind: "mirror", x: 360, y: 250, angle: 35, half: 90, label: "镜面 A" },
         { kind: "mirror", x: 640, y: 400, angle: -40, half: 90, label: "镜面 B" },
-        { kind: "glass", x: 600, y: 170, angle: 12, hw: 90, hh: 50, n: 1.5, label: "玻璃砖" }
+        { kind: "glass", x: 600, y: 170, angle: 12, hw: 90, hh: 50, n: 1.5, label: "玻璃砖" },
+        { kind: "mass", x: 430, y: 250, angle: 0, k: 700, absorb: 54, label: "质量" }
       ],
       targets: []
     }
@@ -420,6 +519,7 @@
 
   function partRadius(p) {
     if (p.kind === "mirror") return p.half;
+    if (p.kind === "mass") return p.absorb;
     if (p.kind === "glass" || p.kind === "water") {
       return Math.hypot(p.hw, p.hh);
     }
@@ -462,6 +562,18 @@
         var lb = el("text", { class: "opt__tag", x: 0, y: p.hh + 16, "text-anchor": "middle" });
         lb.textContent = p.label + " n=" + p.n;
         g.appendChild(lb);
+      } else if (p.kind === "mass") {
+        /* 质量：不是玻璃球，不折射也不反射 —— 它只是把光掰弯。
+           外面一圈吸积盘兼命中区（掉进去就被吞），外加一层透镜光晕。 */
+        g.appendChild(el("circle", { class: "mass__halo", cx: 0, cy: 0, r: p.absorb * 1.5 }));
+        g.appendChild(el("circle", { class: "mass__disk", cx: 0, cy: 0, r: p.absorb }));
+        g.appendChild(el("circle", { class: "mass__core", cx: 0, cy: 0, r: p.absorb * 0.56 }));
+        g.appendChild(el("circle", { class: "opt__hit", cx: 0, cy: 0, r: p.absorb }));
+        var mt = el("text", {
+          class: "opt__tag", x: 0, y: p.absorb + 18, "text-anchor": "middle"
+        });
+        mt.textContent = p.label;
+        g.appendChild(mt);
       } else {
         g.appendChild(el("line", { class: "opt__dir", x1: 0, y1: 0, x2: 26, y2: 0 }));
         g.appendChild(el("polygon", { class: "opt__dirhead", points: "26,0 17,-5 17,5" }));
@@ -481,8 +593,12 @@
     }
   }
 
+  /* 所有元件共用这一个 transform（旋转手柄靠它定位）。
+     质量是个圆盘、没有「朝向」，所以 angle 要容错 ——
+     之前没容错，一进第四关就 p.angle.toFixed 崩掉。 */
   function partTransform(p) {
-    return "translate(" + p.x.toFixed(2) + " " + p.y.toFixed(2) + ") rotate(" + p.angle.toFixed(2) + ")";
+    return "translate(" + p.x.toFixed(2) + " " + p.y.toFixed(2) +
+           ") rotate(" + (p.angle || 0).toFixed(2) + ")";
   }
 
   function renderTargets(hitMap) {
@@ -737,7 +853,7 @@
       window.console.warn("[光路] 第 " + (li + 1) + " 关扫不到解，请检查关卡数据");
     }
 
-    elLevelTag.textContent = lv.free ? "沙盒 · 无目标" : "第 " + (li + 1) + " 关 / 共 3 关";
+    elLevelTag.textContent = lv.free ? "沙盒 · 无目标" : "第 " + (li + 1) + " 关 / 共 4 关";
     elName.textContent = lv.name;
     elHint.textContent = lv.hint;
     elLesson.textContent = lv.lesson;
