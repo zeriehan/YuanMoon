@@ -303,13 +303,19 @@
           <h3 class="shot__title">3D 与平面</h3>
           <span class="shot__kind">图像</span>
         </div>
-        <div class="shot__grid" aria-hidden="true">
-          <div class="shot__cell"><span>渲染练习</span></div>
-          <div class="shot__cell"><span>字体排印</span></div>
-          <div class="shot__cell"><span>版面构成</span></div>
-          <div class="shot__cell"><span>配色实验</span></div>
+        <!-- 格子是真按钮：原生可聚焦、回车能触发、读屏能念出名字。
+             上一版这里是 aria-hidden 的 div —— 可交互内容不能对辅助技术隐藏。 -->
+        <div class="shot__grid">
+          <button class="shot__cell" type="button" data-shot="0" data-caption="渲染练习">
+            <span>渲染练习</span></button>
+          <button class="shot__cell" type="button" data-shot="1" data-caption="字体排印">
+            <span>字体排印</span></button>
+          <button class="shot__cell" type="button" data-shot="2" data-caption="版面构成">
+            <span>版面构成</span></button>
+          <button class="shot__cell" type="button" data-shot="3" data-caption="配色实验">
+            <span>配色实验</span></button>
         </div>
-        <p class="shot__note">都是练习。攒够一批，再挑几张放上来。</p>
+        <p class="shot__note">都是练习。攒够一批，再挑几张放上来。点任意一格看大图。</p>
       </article>
 
       <!-- 视频类：剪辑 -->
@@ -407,5 +413,28 @@
 
 <script src="scripts/main.js" defer></script>
 <script src="site.apply.js" defer></script>
+<!-- 图集灯箱。点格子打开，Esc / 点遮罩关闭，← → 切换。
+     没有 data-full 时走占位分支，不假装有图。 -->
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true"
+     aria-label="作品大图" hidden>
+  <button class="lightbox__scrim" type="button" data-close tabindex="-1"
+          aria-label="关闭"></button>
+  <figure class="lightbox__stage">
+    <img class="lightbox__img" id="lightboxImg" alt="" hidden>
+    <div class="lightbox__ph" id="lightboxPh">
+      <p class="lightbox__ph-title" id="lightboxPhTitle"></p>
+      <p class="lightbox__ph-note">这一格将来放作品图。<br>填上 data-full 就会显示真图。</p>
+    </div>
+    <figcaption class="lightbox__cap" id="lightboxCap"></figcaption>
+  </figure>
+  <button class="lightbox__nav lightbox__nav--prev" type="button"
+          id="lightboxPrev" aria-label="上一张">&#8592;</button>
+  <button class="lightbox__nav lightbox__nav--next" type="button"
+          id="lightboxNext" aria-label="下一张">&#8594;</button>
+  <button class="lightbox__close" type="button" id="lightboxClose" aria-label="关闭">&#215;</button>
+  <p class="lightbox__count" id="lightboxCount"></p>
+</div>
+
+<script src="scripts/lightbox.js" defer></script>
 </body>
 </html>
