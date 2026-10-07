@@ -159,6 +159,44 @@
     return n;
   }
 
+  /* ====================== 波动光学 ======================
+     ----------------------------------------------------------------------
+     这一层和前面三关不是一回事。反射/折射/引力都是「追一条光线」，
+     问的是它朝哪儿走；波动光学问的是「屏上每个位置有多亮」。
+
+     几何光学的 _y = sinθ 只是波动光学的长波极限。一旦缝的尺寸和波长
+     可比，就必须换成叠加：屏上某点的强度等于各条路径的相位差平方和。
+
+     双缝（最简情形）只有两条路径：
+         光程差  δ = d·sinθ
+         相位差  φ = 2πδ/λ
+         强度    I = cos²(φ/2) = cos²(π·d·sinθ/λ)
+     所以亮纹出现在 d·sinθ = mλ 处，屏上相邻亮纹的间距是
+         Δy ≈ λL/d        （L 是缝到屏的距离）
+     —— 波长越长纹越疏，缝距越大纹越密。这一条就是这一关的全部题眼。 */
+
+  /* 屏上相对中心 y 处、缝距 d、波长 λ、屏距 L 处的相对强度 0–1。
+     纯双缝，不含单缝衍射包络 —— 包络要再给缝宽一个参数，
+     对「理解条纹间距」反而是干扰，先不加。 */
+  function interference(y, d, lambda, L) {
+    if (d <= 0 || lambda <= 0) return 0;
+    var th = Math.atan(y / L);                 // 从缝心量到屏上某点的角度
+    var phi = Math.PI * d * Math.sin(th) / lambda;   // φ/2
+    return Math.pow(Math.cos(phi), 2);
+  }
+
+  /* 亮纹（极大）的位置：y = m·λL/d。返回屏上 ±halfH 内的可见级次。 */
+  function brightFringes(seg) {
+    var out = [];
+    var step = seg.lambda * seg.L / seg.d;
+    if (!isFinite(step) || step <= 0) return out;
+    for (var m = -40; m <= 40; m++) {
+      var y = m * step;
+      if (Math.abs(y) <= seg.half + 1) out.push(y);
+    }
+    return out;
+  }
+
   /* ====================== 追迹 ====================== */
 
   /* 场景快照：把当前元件状态编译成线段集合 + 质量点。
@@ -175,6 +213,15 @@
       } else if (p.kind === "mass") {
         p.idx = i;
         masses.push(p);
+      } else if (p.kind === "screen") {
+        /* 屏是一面竖直的墙：光打上去就停（屏不透明），被打中处的强度
+           由波动那一层算。缝的位置在 hit 判定里用，不参与几何求交。 */
+        segs.push({
+          kind: "screen",
+          ax: p.x, ay: p.y - p.hh, bx: p.x, by: p.y + p.hh,
+          nx: 1, ny: 0, id: i,
+          d: p.d, lambda: p.lambda, L: p.L, half: p.hh
+        });
       }
     }
     return { segs: segs, masses: masses, targets: targets || [] };
@@ -194,6 +241,19 @@
   function exitView(p, d) {
     var t = exitT(p, d);
     return v(p.x + d.x * t, p.y + d.y * t);
+  }
+
+  /* 靶心下方是否有一面屏？有的话把它连同缝参数一起返回。 */
+  function screenUnder(scene, x, y) {
+    var segs2 = scene.segs || [];
+    for (var i = 0; i < segs2.length; i++) {
+      var g = segs2[i];
+      if (g.kind !== "screen") continue;
+      if (pointSegDist(x, y, g.ax, g.ay, g.bx, g.by) < 3) {
+        return { py: (g.ay + g.by) / 2, d: g.d, lambda: g.lambda, L: g.L, seg: g };
+      }
+    }
+    return null;
   }
 
   function trace(start, dir, scene, startN) {
@@ -320,6 +380,24 @@
 
       seg = best.seg;
 
+      if (seg.kind === "screen") {
+        /* 屏被照亮的是**整个屏面**，不是光路撞上的那一个点 —— 这正是
+           波动光学和几何光学分道的地方：衍射把光铺开了。所以命中判定
+           改成「屏上这个位置够不够亮」，I ≥ 0.85 才算正好落在亮纹上。 */
+        for (j = 0; j < scene.targets.length; j++) {
+          var tg3 = scene.targets[j];
+          var sc3 = screenUnder(scene, tg3.x, tg3.y);
+          if (!sc3) continue;
+          var I3 = interference(tg3.y - sc3.py, sc3.d, sc3.lambda, sc3.L);
+          if (I3 >= 0.85) hit[j] = true;
+          else if (I3 > 0.6) {
+            marks.push({ x: np.x, y: np.y, text: "此处强度 " + (I3 * 100).toFixed(0) + "%" });
+          }
+        }
+        p = np;
+        break;
+      }
+
       if (seg.kind === "mirror") {
         d = reflect(d, v(seg.nx, seg.ny));
         p = np;
@@ -401,6 +479,24 @@
       targets: [{ x: 830, y: 400, r: 30 }]
     },
     {
+      name: "双缝干涉",
+      hint: "这道题没有光路可追 —— 屏上每个位置各有各的亮度。拧缝距，让条纹正好落在靶心上。",
+      lesson: [
+        "几何光学到这里就失效了：缝的尺寸和波长可比时，必须把两条路径叠起来。",
+        "屏上某点的强度 I = cos²(π·d·sinθ/λ)，亮纹出现在 d·sinθ = mλ。",
+        "相邻亮纹的间距因此是 Δy = λL/d —— 缝拉得越开，纹挤得越密。"
+      ].join(" "),
+      pivot: 1,
+      /* 这一关拧的是缝距 d，不是角度 */
+      scan: { i: 1, prop: "d", from: 8, to: 160, step: 0.5, unit: " px" },
+      parts: [
+        { kind: "emitter", x: 100, y: 260, angle: 0, label: "光源" },
+        { kind: "screen", x: 620, y: 260, angle: 0, hh: 130,
+          d: 90, lambda: 7, L: 250, label: "双缝屏" }
+      ],
+      targets: [{ x: 620, y: 332, r: 13 }]
+    },
+    {
       name: "自由搭建",
       hint: "没有目标，随便拖。镜子和玻璃都能转，试试让光在两面镜子之间来回。",
       lesson: "沙盒里的每个元件都能平移和旋转。这里没有标准答案，光线会告诉你它想去哪。",
@@ -422,27 +518,38 @@
   /* 扫描 pivot 元件的旋转角，找出所有能让全部靶心命中的角度。
      这既是提示的来源，也顺手证明"这一关确实有解" —— 无解会 warn。
      注意：被扫描的永远是 pivot，但**发射点始终是光源**。 */
+  /* 关卡可以声明 scan，说明这一关该拧的是**哪个属性**：
+       scan: { i: 1, prop: "d", from: 10, to: 140, step: 1, unit: "" }
+     不声明就退回扫角度 —— 前四关都是拧角度。
+     波动光学那一关拧的是缝距 d，转屏的角度没有意义，所以必须走属性扫描。 */
+  function scanSpec(level) {
+    if (level.scan) return level.scan;
+    return { i: level.pivot, prop: "angle", from: 0, to: 360, step: SOLVE_STEP, unit: "°" };
+  }
+
   function solveAngles(level) {
-    if (level.free || level.pivot < 0 || !level.targets.length) return [];
+    if (level.free || !level.targets.length) return [];
     var emIdx = -1;
     level.parts.forEach(function (p, i) { if (p.kind === "emitter") emIdx = i; });
     if (emIdx < 0) return [];
+    var sp = scanSpec(level);
+    if (sp.i < 0 || !level.parts[sp.i]) return [];
 
     var found = [];
     var probe = cloneParts(level.parts);
-    for (var a = 0; a < 360; a += SOLVE_STEP) {
-      probe[level.pivot].angle = a;
+    for (var a = sp.from; a <= sp.to + 1e-9; a += sp.step) {
+      probe[sp.i][sp.prop] = a;
       var scene = buildScene(probe, level.targets);
       var em = probe[emIdx];
       var r = trace(v(em.x, em.y), dirOf(em.angle), scene, mediumAt(v(em.x, em.y), probe));
       var all = level.targets.every(function (_, i) { return r.hit[i]; });
-      if (all) found.push(a);
+      if (all) found.push(+a.toFixed(4));
     }
     // 收成区间，提示时好说
     var groups = [];
     found.forEach(function (a) {
       var g = groups[groups.length - 1];
-      if (g && a - g[g.length - 1] <= SOLVE_STEP * 1.5) g.push(a);
+      if (g && a - g[g.length - 1] <= sp.step * 1.5) g.push(a);
       else groups.push([a]);
     });
     return groups.map(function (g) {
@@ -520,6 +627,7 @@
   function partRadius(p) {
     if (p.kind === "mirror") return p.half;
     if (p.kind === "mass") return p.absorb;
+    if (p.kind === "screen") return p.hh;
     if (p.kind === "glass" || p.kind === "water") {
       return Math.hypot(p.hw, p.hh);
     }
@@ -562,6 +670,30 @@
         var lb = el("text", { class: "opt__tag", x: 0, y: p.hh + 16, "text-anchor": "middle" });
         lb.textContent = p.label + " n=" + p.n;
         g.appendChild(lb);
+      } else if (p.kind === "screen") {
+        /* 屏：一面竖直的墙，上面按 I(y) 画一排光点。
+           中央亮、往两边按 cos² 衰减 —— 条纹间距就是 λL/d，拧 d 就看得见。 */
+        var N = 73;
+        for (var si = 0; si < N; si++) {
+          var sy = -p.hh + (2 * p.hh) * si / (N - 1);
+          var inten = interference(sy, p.d, p.lambda, p.L);
+          if (inten < 0.04) continue;
+          g.appendChild(el("circle", {
+            class: "screen__dot",
+            cx: 0, cy: sy,
+            r: 1.2 + inten * 4.4,
+            "fill-opacity": (0.16 + inten * 0.84).toFixed(3)
+          }));
+        }
+        g.appendChild(el("line", {
+          class: "screen__wall", x1: 0, y1: -p.hh, x2: 0, y2: p.hh
+        }));
+        g.appendChild(el("line", { class: "opt__hit", x1: 0, y1: -p.hh, x2: 0, y2: p.hh }));
+        var stg = el("text", {
+          class: "opt__tag", x: 0, y: p.hh + 18, "text-anchor": "middle"
+        });
+        stg.textContent = p.label + "  d=" + p.d + "  λ=" + p.lambda;
+        g.appendChild(stg);
       } else if (p.kind === "mass") {
         /* 质量：不是玻璃球，不折射也不反射 —— 它只是把光掰弯。
            外面一圈吸积盘兼命中区（掉进去就被吞），外加一层透镜光晕。 */
@@ -853,7 +985,7 @@
       window.console.warn("[光路] 第 " + (li + 1) + " 关扫不到解，请检查关卡数据");
     }
 
-    elLevelTag.textContent = lv.free ? "沙盒 · 无目标" : "第 " + (li + 1) + " 关 / 共 4 关";
+    elLevelTag.textContent = lv.free ? "沙盒 · 无目标" : "第 " + (li + 1) + " 关 / 共 5 关";
     elName.textContent = lv.name;
     elHint.textContent = lv.hint;
     elLesson.textContent = lv.lesson;
@@ -878,6 +1010,7 @@
     trace: trace, reflect: reflect, refract: refract, raySeg: raySeg,
     criticalAngle: criticalAngle, buildScene: buildScene, mediumAt: mediumAt,
     dirOf: dirOf, norm: norm, dot: dot, r2d: r2d, d2r: d2r,
+    interference: interference, brightFringes: brightFringes,
     LEVELS: LEVELS, state: state, load: load,
     solution: function () { return state.solvedGroups; }
   };

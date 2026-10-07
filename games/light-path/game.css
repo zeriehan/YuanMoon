@@ -206,6 +206,18 @@ body {
   stroke-dasharray: 2 6;
 }
 
+/* ---------------------------- 屏 --------------------------------------
+   波动光学那一关。屏本身是一面墙，亮点是按 I(y) 画的 ——
+   中央亮、往两边按 cos² 衰减，间距就是 λL/d。 */
+.screen__dot {
+  fill: var(--color-accent);
+}
+.screen__wall {
+  stroke: color-mix(in srgb, var(--color-muted) 40%, transparent);
+  stroke-width: 1;
+}
+.opt.is-on .screen__wall { stroke: var(--color-border-accent); }
+
 /* ---------------------------- 质量 ------------------------------------
    引力透镜那关的主角。吸积盘、核心、光晕三层都是纯 CSS，
    不引图片也不引字体。 */

@@ -48,7 +48,8 @@
     <button class="lvnav__btn" data-level="1" type="button">2 折射</button>
     <button class="lvnav__btn" data-level="2" type="button">3 全反射</button>
     <button class="lvnav__btn" data-level="3" type="button">4 引力透镜</button>
-    <button class="lvnav__btn" data-level="4" type="button">自由搭建</button>
+    <button class="lvnav__btn" data-level="4" type="button">5 双缝干涉</button>
+    <button class="lvnav__btn" data-level="5" type="button">自由搭建</button>
   </nav>
 </header>
 
@@ -62,7 +63,11 @@
       <desc id="benchDesc">一束光从光源射出，经镜面反射与玻璃折射后抵达靶点。可以拖动元件改变角度。</desc>
 
       <defs>
-        <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
+        <!-- gradientUnits 必须是 userSpaceOnUse。默认的 objectBoundingBox
+             是相对包围盒的，而**水平光路的包围盒高度为 0**，渐变直接退化 ——
+             表现为整条光路不显示。前四关都是斜线，所以一直没暴露。 -->
+        <linearGradient id="beamGrad" gradientUnits="userSpaceOnUse"
+                        x1="0" y1="0" x2="880" y2="0">
           <stop offset="0%" stop-color="#fffdf7" stop-opacity="0.95"/>
           <stop offset="100%" stop-color="var(--halo-300)" stop-opacity="0.75"/>
         </linearGradient>
