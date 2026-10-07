@@ -2,7 +2,7 @@
 
 个人品牌门户站。纯手写 HTML / CSS / JS，无框架、无构建步骤，改完直接就是能上线的文件。
 
-- **域名（计划）**：`yuanmoon.me`
+- **地址**：`yuanmoon.pages.dev`（Cloudflare Pages 免费分配，**不注册自有域名**）
 - **托管**：Cloudflare Pages（免费）
 - **构建**：无。没有 npm，没有 bundler，没有 node_modules
 
@@ -35,10 +35,9 @@ python -m http.server 8137
 
 ---
 
-## 二、上线：三步
+## 二、上线：两步
 
-**建议顺序：先用免费的 `pages.dev` 上线拿到地址，再去领 `yuanmoon.me` 换上去。**
-这样你今天就能拿到一个能打开的网址，而不是等域名审核（学生包可能要几天）。
+不注册自有域名，直接用 Cloudflare Pages 免费分配的 `pages.dev` 地址。
 
 ### 第 1 步 · 推到 GitHub
 
@@ -62,13 +61,19 @@ python -m http.server 8137
      密码位置要填 **Personal Access Token**（GitHub 密码已停用）。
      令牌在 Settings → Developer settings → Personal access tokens 生成，勾 `repo` 即可。
 
-   > 本地已有三个提交，**不需要**再执行 `git commit`。
+   > 本地已有提交，**不需要**再执行 `git commit`。
 
 ### 第 2 步 · 连 Cloudflare Pages
 
 1. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
 2. 授权 GitHub，选中 `yuanmoon` 仓库
-3. 构建设置这样填（**这一步最容易填错**）：
+3. **项目名填 `yuanmoon`**（Project name），不要改
+
+   这一步很关键：Pages 的默认地址是 `<项目名>.pages.dev`，所以项目名叫 `yuanmoon`，
+   地址就是 `yuanmoon.pages.dev` —— **和代码里写死的地址一致，不用改任何文件**。
+   （若提示重名被占，见第三节末尾）
+
+4. 构建设置这样填（**这一步最容易填错**）：
 
    | 字段 | 填什么 |
    |---|---|
@@ -78,48 +83,19 @@ python -m http.server 8137
    | Build output directory | `/` |
 
    本站是纯静态、没有编译过程，所以 build command 留空、输出目录就是仓库根。
-4. 点 **Save and Deploy**，一两分钟后拿到 `xxx.pages.dev` 这样的地址
+5. 点 **Save and Deploy**，一两分钟后拿到 `https://yuanmoon.pages.dev`
 
-5. **当场验一遍**（这四条都要通）：
+6. **当场验一遍**（这四条都要通）：
 
    | 打开 | 期望 |
    |---|---|
-   | `https://xxx.pages.dev/` | 首页，首屏一轮月亮 |
+   | `https://yuanmoon.pages.dev/` | 首页，首屏一轮月亮 |
    | `.../games/moon-phase/` | 月相挑战，能玩 |
    | `.../games/light-path/` | 光路挑战，能玩 |
    | `.../随便敲个不存在的路径` | 落到 404 页 |
 
-   > 注意：此时 `canonical` / `og:image` 里的域名还是占位的 `yuanmoon.me`，
-   > **这是对的**，等域名到手再换（见第 3 步）。
-
 > 如果以后你把仓库上移到 `YuanMoon/` 根目录、站点挪进 `web/start/`，
 > 把 Build output directory 改成 `web/start` 就行，一个仓库能挂多个站。
-
-### 第 3 步 · 领 yuanmoon.me 并绑上去
-
-**先去申请 GitHub 学生包**（Settings → Education benefits），审核要几天到两周，
-先申请着，不影响站已经上线 —— 上线路径完全不依赖它。
-
-1. GitHub → 头像 → **Settings** → **Education benefits** → 申请 GitHub Student
-   Developer Pack（学生证 / 在读证明 / 课表任选其一）
-2. 审核通过后进入 **GitHub Education** 页面，找到 **Namecheap** 条目 → **Get Domain**
-3. 搜 `yuanmoon.me`，右侧出现 **FREE** 就加入购物车结算。**结算时用你 GitHub 的主邮箱**，
-   否则优惠不生效
-4. Cloudflare Dashboard → **Add a site** → 输入 `yuanmoon.me` → 选 **Free**
-5. Cloudflare 给你两个 nameserver → 回 Namecheap → **Domain List** → `yuanmoon.me`
-   → **Manage** → **Nameservers** → **Custom DNS** → 填入 → 保存
-6. 等生效（十几分钟到几小时）→ 回 Pages 项目 → **Custom domains** →
-   **Set up a custom domain** → 输入 `yuanmoon.me`
-7. **换掉占位域名**：找 `yuanmoon.me` 改成实际域名的地方（见下面「换域名」一节），
-   提交等一次自动部署
-
-### 换域名要改的地方（漏了不报错，只会让分享预览和收录悄悄失效）
-
-```bash
-grep -rn "yuanmoon.me" --include="*.html" --include="*.txt" --include="*.xml" .
-```
-
-会列出五个文件，逐个替换成新域名即可。
 
 ### 以后每次更新
 
@@ -139,24 +115,48 @@ Cloudflare Dashboard → Workers & Pages → Create → Pages → **Upload asset
 
 ---
 
-## 三、关于 yuanmoon.me 这个域名
+## 三、关于地址
 
-**先说清一件事：学生包不是上线的必要条件。** Cloudflare Pages 托管免费，
-不领域名也能立刻拿到 `xxx.pages.dev` 上线。学生包只解决一件事 —— **免费拿一个域名**。
+站址就是 `https://yuanmoon.pages.dev`，**不注册自有域名**。这是个知情选择，
+好处和代价都写在这里，方便以后回来看。
 
-**具体操作流程在「二、第 3 步」**，这一节只记几件容易被忘掉的事。
+**好处**：零成本、免备案（境外节点）、不需要续费、不需要实名、
+Push 完三十秒生效，代码一行不用改。
 
-**为什么值得领。** `*.pages.dev` 也能跑，但别人看到的是" someone's Cloudflare 站点"。
-品牌域名是"这是他做的"的第一层证据 —— 而 `.me` 单价便宜、学生包免费一年。
-顺带还有 GitHub Pro（私有库无限）和 Copilot 学生版，对写代码是实打实的。
+**代价**（三条，按影响排序）：
 
-**⚠️ 学生包的内容会变，别照着旧文章操作。** 有来源说 DigitalOcean 的 $200 额度
-已在 2026-07-31 退出该包（引用的是 GitHub 官方 changelog，我未逐条核实）。
-申请前直接看 <https://education.github.com/pack>，以页面当时写的为准。
+1. **搜索引擎基本不收录。** `pages.dev` 是 Cloudflare 的子域，权重极低，
+   Google 不会把它当正常站点索引。`sitemap.xml` 和 `robots.txt` 仍然留着，
+   等以后换地址就有用了 —— 但现在别指望靠搜索带来流量。
+2. **国内访问不稳定。** Cloudflare 在境内时快时慢，取决于线路和时段。
+   微信/QQ 内置浏览器打开可能明显卡顿。**要把链接发给同学试玩的话，
+   先自己在手机微信里打开一遍**，别默认它好使。
+3. **地址不好记、不好口头传播。** 别人不会记住 `yuanmoon.pages.dev`，
+   只能收藏或扫码。
 
-**审核材料。** 最稳的是学校邮箱（`.edu.cn` 之类）走自动验证；没有就用学生证照片 /
-在读证明 / 学费单据。GitHub 每年会重新核验在读状态，域名本身是"一年期"，
-到期不续就把域名换掉，站点不受影响。
+**分享预览仍然可用。** `og:image` 指向的是 `pages.dev` 上的绝对地址，
+微信/微博抓图能正常显示卡片。
+
+### 如果 Pages 项目名被迫改了
+
+重名被占时 Cloudflare 会让你换名，这时地址就变了。要改的地方一次列全：
+
+```bash
+grep -rn "yuanmoon.pages.dev" --include="*.html" --include="*.txt" --include="*.xml" .
+```
+
+会列出五个文件：`index.html`、`games/moon-phase/index.html`、
+`games/light-path/index.html`、`robots.txt`、`sitemap.xml`。
+替换成新地址后提交，等一次自动部署。
+
+> 漏改不报错，只是分享预览指向一张抓不到的图、搜索收录失效 —— 很难发现，
+> 所以改地址时记得跑一遍上面这条命令确认。
+
+### 以后想换自有域名了怎么办
+
+不用改任何代码。Pages 项目 → **Custom domains** → **Set up a custom domain** →
+填新域名，等 DNS 生效即可。域名和 Pages 项目是解绑的，换域名不影响已有链接。
+之后记得按上一节把五处地址一起换掉。
 
 ---
 
@@ -258,10 +258,11 @@ start/
 > SVG 的第一条弧、关卡扫描把镜子当成光源发射光线、以及光线没钳到台面内糊在控制台上。
 > 另外：验收必须用**独立的浏览器 profile**，复用会命中 HTTP 缓存，让你看到改之前的旧 CSS。
 
-> **域名占位提示**：全站现在按 `yuanmoon.me` 写死了三处绝对地址 ——
-> `index.html` 与 `games/moon-phase/index.html` 里的 `canonical` / `og:url` / `og:image`，
-> 以及 `robots.txt`、`sitemap.xml`。**如果最后领到的域名不是这个，这五处要一起换。**
-> 换漏了不会报错，只会让分享预览和搜索引擎收录默默失效。
+> **地址占位提示**：全站按 `https://yuanmoon.pages.dev` 写死了绝对地址 ——
+> `index.html` 与两个游戏页里的 `canonical` / `og:url` / `og:image`，
+> 以及 `robots.txt`、`sitemap.xml`。这五处**必须和 Pages 项目名一致**：
+> 项目名填 `yuanmoon` 就一致、一个文件都不用改；被迫改名就要五处一起换。
+> 换漏了不会报错，只会让分享预览默默失效。检查命令见第三节。
 
 ---
 

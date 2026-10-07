@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   缘梦 YuanMoon · 站点地图
-  域名如果是别的（不是 yuanmoon.me），这里和 robots.txt 里的两条链接要一起改。
+  用的是 Cloudflare Pages 的项目地址 yuanmoon.pages.dev。
+  Pages 项目名若改动（重名被占等原因），这里和 robots.txt 里的那条链接
+  以及两个游戏页的 canonical / og:url / og:image 都要一起改。
   新增游戏后，往 <urlset> 里补一个 <url> 块即可。
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://yuanmoon.me/</loc>
+    <loc>https://yuanmoon.pages.dev/</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://yuanmoon.me/games/moon-phase/</loc>
+    <loc>https://yuanmoon.pages.dev/games/moon-phase/</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://yuanmoon.me/games/light-path/</loc>
+    <loc>https://yuanmoon.pages.dev/games/light-path/</loc>
     <lastmod>2026-10-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>

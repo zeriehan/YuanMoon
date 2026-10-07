@@ -5,4 +5,5 @@ Allow: /
 # 404 页面本身没有收录价值
 Disallow: /404.html
 
-Sitemap: https://yuanmoon.me/sitemap.xml
+# 用的是 Cloudflare Pages 的项目地址。Pages 项目名若改动，这条链接要跟着改。
+Sitemap: https://yuanmoon.pages.dev/sitemap.xml
