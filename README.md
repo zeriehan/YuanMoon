@@ -97,7 +97,8 @@ python -m http.server 8137
 
 ### 第 3 步 · 领 yuanmoon.me 并绑上去
 
-**先去申请 GitHub 学生包**，审核要 1–3 天，先申请着，不影响站已经上线。
+**先去申请 GitHub 学生包**（Settings → Education benefits），审核要几天到两周，
+先申请着，不影响站已经上线 —— 上线路径完全不依赖它。
 
 1. GitHub → 头像 → **Settings** → **Education benefits** → 申请 GitHub Student
    Developer Pack（学生证 / 在读证明 / 课表任选其一）
@@ -140,22 +141,22 @@ Cloudflare Dashboard → Workers & Pages → Create → Pages → **Upload asset
 
 ## 三、关于 yuanmoon.me 这个域名
 
-**具体操作流程在「二、第 3 步」**，这一节只记三件容易被忘掉的事。
+**先说清一件事：学生包不是上线的必要条件。** Cloudflare Pages 托管免费，
+不领域名也能立刻拿到 `xxx.pages.dev` 上线。学生包只解决一件事 —— **免费拿一个域名**。
+
+**具体操作流程在「二、第 3 步」**，这一节只记几件容易被忘掉的事。
 
 **为什么值得领。** `*.pages.dev` 也能跑，但别人看到的是" someone's Cloudflare 站点"。
-品牌域名是"这是他做的"的第一层证据 —— 而且 `.me` 单价便宜、学生包免费一年。
+品牌域名是"这是他做的"的第一层证据 —— 而 `.me` 单价便宜、学生包免费一年。
+顺带还有 GitHub Pro（私有库无限）和 Copilot 学生版，对写代码是实打实的。
 
-**免费期只有一年。** 到期不续的话，把域名换掉就行，站点本身完全不受影响
-（换个 Custom domain 指向同一个 Pages 项目，两分钟的事）。
+**⚠️ 学生包的内容会变，别照着旧文章操作。** 有来源说 DigitalOcean 的 $200 额度
+已在 2026-07-31 退出该包（引用的是 GitHub 官方 changelog，我未逐条核实）。
+申请前直接看 <https://education.github.com/pack>，以页面当时写的为准。
 
-**顺便看一眼 Name.com 那条。** GitHub 学生包在 Name.com 也能在 25 个以上后缀里任选一个
-（`.dev` / `.app` / `.live` / `.studio` 等），同样免费一年。想要 `yuanmoon.dev`
-这类更适合开发者的后缀可以从那里拿 —— 但注意 `.dev` / `.app` 强制 HTTPS，
-Cloudflare Pages 默认就带证书，不受影响。
-
-**不需要备案。** Cloudflare Pages 走境外节点，不涉及 ICP 备案。代价是国内访问速度一般
-（晚高峰可能几百毫秒），这是"零成本"必然的交换。想国内秒开必须备案，
-而备案需要国内云资源 = 花钱。
+**审核材料。** 最稳的是学校邮箱（`.edu.cn` 之类）走自动验证；没有就用学生证照片 /
+在读证明 / 学费单据。GitHub 每年会重新核验在读状态，域名本身是"一年期"，
+到期不续就把域名换掉，站点不受影响。
 
 ---
 
