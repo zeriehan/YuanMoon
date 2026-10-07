@@ -19,25 +19,56 @@ python -m http.server 8137
 # 打开 http://127.0.0.1:8137
 ```
 
+访问 <http://127.0.0.1:8137>，四个入口都该通：
+
+| 路径 | 是什么 |
+|---|---|
+| `/` | 品牌门户首页 |
+| `/games/moon-phase/` | 月相挑战 |
+| `/games/light-path/` | 光路挑战 |
+| `/404.html` | 找不到页面时的样子 |
+
+> 这个服务是后台进程，**换个会话/隔夜再回来通常已经停了**，
+> 表现是浏览器报"无法访问此网站"。重跑一次上面的命令即可。
+> 判断方法：`curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:8137/`
+> 返回 `200` 就是在跑，返回 `000` 就是没跑。
+
 ---
 
-## 二、部署到 Cloudflare Pages
+## 二、上线：三步
 
-### 方式 A：连 Git 仓库（推荐，以后 push 即上线）
+**建议顺序：先用免费的 `pages.dev` 上线拿到地址，再去领 `yuanmoon.me` 换上去。**
+这样你今天就能拿到一个能打开的网址，而不是等域名审核（学生包可能要几天）。
 
-1. 把本站推到 GitHub：
+### 第 1 步 · 推到 GitHub
+
+1. 打开 <https://github.com/new> 建仓库
+   - Repository name：`yuanmoon`
+   - 选 **Public**（连 Cloudflare 最省事）
+   - **不要**勾 "Add a README file" —— 本地已经有
+2. 连远端并推送（在仓库目录里执行）：
 
    ```bash
-   git add -A
-   git commit -m "初始版本：缘梦品牌门户"
    git branch -M main
    git remote add origin git@github.com:<你的用户名>/yuanmoon.git
    git push -u origin main
    ```
 
-2. 打开 Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-3. 授权 GitHub，选中刚才的仓库
-4. 构建设置这样填（**这一步最容易填错**）：
+   推送要凭据，二选一：
+   - **SSH**（推荐）：上面那条 `git@github.com:` 就是。若你的 SSH 不是默认配置，
+     前面加 `GIT_SSH_COMMAND`，例如
+     `GIT_SSH_COMMAND="ssh -p 端口 -i 私钥路径" git push -u origin main`
+   - **HTTPS**：把 remote 换成 `https://github.com/<用户名>/yuanmoon.git`，
+     密码位置要填 **Personal Access Token**（GitHub 密码已停用）。
+     令牌在 Settings → Developer settings → Personal access tokens 生成，勾 `repo` 即可。
+
+   > 本地已有三个提交，**不需要**再执行 `git commit`。
+
+### 第 2 步 · 连 Cloudflare Pages
+
+1. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+2. 授权 GitHub，选中 `yuanmoon` 仓库
+3. 构建设置这样填（**这一步最容易填错**）：
 
    | 字段 | 填什么 |
    |---|---|
@@ -46,18 +77,50 @@ python -m http.server 8137
    | Build command | **留空** |
    | Build output directory | `/` |
 
-   因为本站是纯静态、没有编译过程，所以 build command 留空、输出目录就是仓库根。
-5. 点 **Save and Deploy**，一两分钟后拿到 `yuanmoon.pages.dev` 这样的地址。
+   本站是纯静态、没有编译过程，所以 build command 留空、输出目录就是仓库根。
+4. 点 **Save and Deploy**，一两分钟后拿到 `xxx.pages.dev` 这样的地址
 
-> 如果以后你把仓库上移到 `YuanMoon/` 根目录、站点挪进 `web/start/`，把
-> Build output directory 改成 `web/start` 就行，一个仓库能挂多个站。
+5. **当场验一遍**（这四条都要通）：
 
-### 方式 B：直接上传（不想连 Git）
+   | 打开 | 期望 |
+   |---|---|
+   | `https://xxx.pages.dev/` | 首页，首屏一轮月亮 |
+   | `.../games/moon-phase/` | 月相挑战，能玩 |
+   | `.../games/light-path/` | 光路挑战，能玩 |
+   | `.../随便敲个不存在的路径` | 落到 404 页 |
 
-Cloudflare Dashboard → Workers & Pages → Create → Pages → **Upload assets**，
-把整个 `start` 目录打包成 zip 上传。缺点是没有自动部署，每次改都要重传。
+   > 注意：此时 `canonical` / `og:image` 里的域名还是占位的 `yuanmoon.me`，
+   > **这是对的**，等域名到手再换（见第 3 步）。
 
-### 每次更新
+> 如果以后你把仓库上移到 `YuanMoon/` 根目录、站点挪进 `web/start/`，
+> 把 Build output directory 改成 `web/start` 就行，一个仓库能挂多个站。
+
+### 第 3 步 · 领 yuanmoon.me 并绑上去
+
+**先去申请 GitHub 学生包**，审核要 1–3 天，先申请着，不影响站已经上线。
+
+1. GitHub → 头像 → **Settings** → **Education benefits** → 申请 GitHub Student
+   Developer Pack（学生证 / 在读证明 / 课表任选其一）
+2. 审核通过后进入 **GitHub Education** 页面，找到 **Namecheap** 条目 → **Get Domain**
+3. 搜 `yuanmoon.me`，右侧出现 **FREE** 就加入购物车结算。**结算时用你 GitHub 的主邮箱**，
+   否则优惠不生效
+4. Cloudflare Dashboard → **Add a site** → 输入 `yuanmoon.me` → 选 **Free**
+5. Cloudflare 给你两个 nameserver → 回 Namecheap → **Domain List** → `yuanmoon.me`
+   → **Manage** → **Nameservers** → **Custom DNS** → 填入 → 保存
+6. 等生效（十几分钟到几小时）→ 回 Pages 项目 → **Custom domains** →
+   **Set up a custom domain** → 输入 `yuanmoon.me`
+7. **换掉占位域名**：找 `yuanmoon.me` 改成实际域名的地方（见下面「换域名」一节），
+   提交等一次自动部署
+
+### 换域名要改的地方（漏了不报错，只会让分享预览和收录悄悄失效）
+
+```bash
+grep -rn "yuanmoon.me" --include="*.html" --include="*.txt" --include="*.xml" .
+```
+
+会列出五个文件，逐个替换成新域名即可。
+
+### 以后每次更新
 
 ```bash
 git add -A && git commit -m "改了什么" && git push
@@ -65,42 +128,34 @@ git add -A && git commit -m "改了什么" && git push
 
 推送后 Cloudflare 自动重建，约 30 秒生效。免费版每月 500 次构建，日常改动绰绰有余。
 
+> **改完记得自己验一遍**：`.workbuddy/checks/` 下有验收脚本，见目录结构那一节。
+> 浏览器缓存会让你看到改之前的旧样式，别被它骗了。
+
+### 不想连 Git 的做法
+
+Cloudflare Dashboard → Workers & Pages → Create → Pages → **Upload assets**，
+把整个 `start` 目录打包成 zip 上传。缺点是没有自动部署，每次改都要重传。
+
 ---
 
-## 三、拿到 yuanmoon.me 这个域名（学生免费一年）
+## 三、关于 yuanmoon.me 这个域名
 
-站点先用 `*.pages.dev` 也能跑，但品牌域名值得花十分钟领一下。
+**具体操作流程在「二、第 3 步」**，这一节只记三件容易被忘掉的事。
 
-1. 打开 GitHub → 右上角头像 → **Settings** → **Education benefits** → 申请 GitHub Student
-   Developer Pack，提交学生证明（学生证 / 在读证明 / 课表任选其一）。
-2. 审核通过后进入 **GitHub Education** 页面，找到 **Namecheap** 条目，点 **Get Domain**。
-3. 在 Namecheap 搜索 `yuanmoon.me`，右侧出现 **FREE** 就加入购物车结算。
-   结算时**用你 GitHub 的主邮箱**，否则优惠不生效。
-4. 顺手把 **Name.com** 那条也看一眼 —— 它能在 25 个以上后缀里任选一个
-   （`.dev` / `.app` / `.live` / `.studio` 等），也是免费一年。想要 `yuanmoon.dev`
-   这类更适合开发者的后缀可以从这里拿。
+**为什么值得领。** `*.pages.dev` 也能跑，但别人看到的是" someone's Cloudflare 站点"。
+品牌域名是"这是他做的"的第一层证据 —— 而且 `.me` 单价便宜、学生包免费一年。
 
-**务必记下两件事**：免费期是**一年**，以及**续费价**（`.me` 大约每年 10–15 美元）。
-到期不想续，提前把域名换掉就行，站点本身不受影响。
+**免费期只有一年。** 到期不续的话，把域名换掉就行，站点本身完全不受影响
+（换个 Custom domain 指向同一个 Pages 项目，两分钟的事）。
 
-### 把域名接到站点上
+**顺便看一眼 Name.com 那条。** GitHub 学生包在 Name.com 也能在 25 个以上后缀里任选一个
+（`.dev` / `.app` / `.live` / `.studio` 等），同样免费一年。想要 `yuanmoon.dev`
+这类更适合开发者的后缀可以从那里拿 —— 但注意 `.dev` / `.app` 强制 HTTPS，
+Cloudflare Pages 默认就带证书，不受影响。
 
-推荐把 DNS 交给 Cloudflare 管（以后加子域名、接 R2 都方便）：
-
-1. Cloudflare Dashboard → **Add a site** → 输入 `yuanmoon.me` → 选 **Free** 计划
-2. Cloudflare 会给你两个 nameserver 地址，复制下来
-3. 回到 Namecheap → **Domain List** → `yuanmoon.me` 右侧 **Manage** →
-   **Nameservers** → 选 **Custom DNS** → 填入 Cloudflare 那两个地址 → 保存
-4. 等生效（通常十几分钟到几小时）
-5. 回到 Cloudflare Pages 项目 → **Custom domains** → **Set up a custom domain** →
-   输入 `yuanmoon.me` → 按提示确认，Cloudflare 会自动加好 DNS 记录
-6. 顺手把 `www.yuanmoon.me` 也加上，指向同一个项目
-
-> 懒人方案：不接 Cloudflare DNS，直接在 Namecheap 的 **Advanced DNS** 里加一条
-> `CNAME @ → 你的项目.pages.dev`。能用，但少了 Cloudflare 那层免费加速和管理能力。
-
-**不需要备案**。Cloudflare Pages 走的是境外节点，不涉及 ICP 备案。
-代价是国内访问速度一般（联通晚高峰可能几百毫秒），这是"零成本"必然的交换。
+**不需要备案。** Cloudflare Pages 走境外节点，不涉及 ICP 备案。代价是国内访问速度一般
+（晚高峰可能几百毫秒），这是"零成本"必然的交换。想国内秒开必须备案，
+而备案需要国内云资源 = 花钱。
 
 ---
 
