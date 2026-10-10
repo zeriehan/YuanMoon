@@ -17,14 +17,26 @@
 ### 第 1 步 · 拿到一份副本
 
 **方式一（推荐）：GitHub Template**
-点仓库右上角的 **Use this template** → 填个名字 → Create。
+
+[github.com/zeriehan/YuanMoon](https://github.com/zeriehan/YuanMoon)
+→ 右上角 **Use this template** → 填个名字 → Create。
 一份副本就到你账号下了，**不用懂 git、不会动到原仓库**。
 
-> 只有仓库主人能打开这个开关。如果你是从别人那儿拿到这个站，让他去
-> **Settings → General → Template repository** 勾一下即可。
+> Template repository 开关已经打开了（**Settings → General → 最下面**）。
+> 如果你是从别人那儿拿到这个站，让他去把那个勾打上即可。
 
-**方式二：直接下载 ZIP**
+**方式二：git clone**
+
+```bash
+git clone git@github.com:zeriehan/YuanMoon.git   # SSH
+git clone https://github.com/zeriehan/YuanMoon.git # HTTPS
+```
+
+**方式三：直接下载 ZIP**
 Code → Download ZIP，解压后改个名字。
+
+> 仓库里的 `.workbuddy/`（验收脚本与记忆）已在 `.gitignore` 里，
+> clone 下来不会有。想自己跑验收的话，配置好本地 Python 就能用。
 
 ### 第 2 步 · 改一个文件
 
@@ -158,7 +170,7 @@ python -m http.server 8137
 
 ### 第 1 步 · 推到 GitHub
 
-1. 打开 <https://github.com/new> 建仓库
+1. 打开 <https://github.com/new> 建仓库（模板使用者跳过这步）
    - Repository name：`yuanmoon`
    - 选 **Public**（连 Cloudflare 最省事）
    - **不要**勾 "Add a README file" —— 本地已经有

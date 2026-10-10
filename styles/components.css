@@ -740,6 +740,7 @@
 
 /* ---------------------------- 工具 ------------------------------------ */
 .tool {
+  position: relative;          /* stretched link 的参照 */
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
@@ -789,6 +790,39 @@
   color: var(--color-faint);
 }
 .tool__aside { justify-self: end; }
+
+/* 整卡可点，但读屏念出来的仍只有标题文字 —— 和作品卡同一套做法。
+   ::after 的 inset:0 把命中区撑到整张卡。 */
+.tool__link {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--dur-base) ease-out;
+}
+.tool__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+}
+.tool:hover .tool__link,
+.tool:focus-within .tool__link { color: var(--color-accent); }
+
+.tool__cta {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  letter-spacing: 0.14em;
+  color: var(--color-accent);
+}
+.tool__cta span {
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.tool:hover .tool__cta span,
+.tool:focus-within .tool__cta span { transform: translateX(5px); }
 
 /* ---------------------------- 图集 ------------------------------------ */
 .shot {
